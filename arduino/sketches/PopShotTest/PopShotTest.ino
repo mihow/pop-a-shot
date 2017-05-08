@@ -4,7 +4,7 @@
 SevenSegTLC disp(6, 7, 2, 1, 0, 5, 4);
 
 const int buttonPin = 38; 
-const int sensorPin = A3
+const int sensorPin = A3;
 int buttonState = digitalRead(buttonPin);
 int sensorValue = 0;
 int counter = 0;
@@ -25,7 +25,7 @@ void setup() {
 void loop() {  
 
 buttonState = digitalRead(buttonPin);
-sensorValue = analogRead(analogInPin);
+sensorValue = analogRead(sensorPin);
 
 if (buttonState == HIGH) {
   counter++;
