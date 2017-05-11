@@ -13,6 +13,7 @@ int maxBrightness = 4095;
 
 // @TODO Move this out of library
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(2, 42, 43, 44);
+//Adafruit_TLC5947 tlc = Adafruit_TLC5947(2, 5, 4, 6);
 
 
 // Constructor
