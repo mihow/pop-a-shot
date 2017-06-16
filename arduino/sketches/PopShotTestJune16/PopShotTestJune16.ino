@@ -1,9 +1,17 @@
-#include <SevenSegTLC.h>
+#include <SevenSeg.h>
+#include "Adafruit_TLC5947.h"
 
-segmentPinOrder = 6, 7, 2, 1, 0, 5, 4;
+// How many boards do you have chained?
+#define NUM_TLC5974 2
 
-SevenSegTLC scoreDisplay(6, 7, 2, 1, 0, 5, 4);
-SevenSegTLC timerDisplay(6, 7, 2, 1, 0, 5, 4);
+#define data   46
+#define clock   45
+#define latch   47
+
+Adafruit_TLC5947 tlc = Adafruit_TLC5947(NUM_TLC5974, clock, data, latch);
+
+SevenSeg scoreDisplay(6, 7, 2, 1, 0, 5, 4);
+SevenSeg timerDisplay(6, 7, 2, 1, 0, 5, 4);
 
 
 
@@ -11,20 +19,18 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Setting up display...");
   
-  scoreDisplay.setNumDigits(3)
-  scoreDisplay.setOffset(0);
-  scoreDisplay.setBrightness(3000);
+  scoreDisplay.setNumDigits(3);
+  //scoreDisplay.setOffset(0);
+  //scoreDisplay.setBrightness(3000);
   
-  scoreDisplay.setNumDigits(2)
-  timerDisplay.setOffset(3);
-  timerDisplay.setBrightess(4095);
+  scoreDisplay.setNumDigits(2);
+  //timerDisplay.setOffset(3);
+  //timerDisplay.setBrightess(4095);
 
-  tlc.clear()
-  tlc.write()
+  //tlc.clear();
+  tlc.write();
   
   Serial.println("Ready!");
-  
-  startTime = millis();
 }
 
 void loop() {
