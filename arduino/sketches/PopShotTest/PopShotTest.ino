@@ -1,71 +1,82 @@
 #include <SevenSegTLC.h>
 
+#define NUM_DIGITS 1
+
 
 SevenSegTLC disp(6, 7, 2, 1, 0, 5, 4);
 
-const int buttonPin = 38; 
-const int sensorPin = A3;
-int buttonState = digitalRead(buttonPin);
-int sensorValue = 0;
-int counter = 12345;
+int sensorPin = 56; // A2 (56-59)
+int buttonPin1 = 40; // B4
+int buttonPin2 = 41;
+int buttonLight1 = 8;
+int buttonLight2 = 7;
+
+int sensorValue = LOW;
+int buttonState1 = HIGH;
+int buttonState2 = HIGH;
+
+int counter = 0;
+int score = 0;
+
 long startTime;
 long elapsedTime;
 
 void setup() {
-  pinMode(buttonPin, INPUT);
-  
-  Serial.begin(9600);
-  delay(200);
-  Serial.println("Setting up display...");
+  pinMode(sensorPin, INPUT);
+  pinMode(buttonPin1, INPUT_PULLUP);
+  pinMode(buttonPin2, INPUT_PULLUP);
+  pinMode(buttonLight1, OUTPUT);
+  pinMode(buttonLight2, OUTPUT);
 
-  disp.setNumDigits(5);
-  delay(200);
-  
+  Serial.begin(9600);
+  Serial.println("Setting up display...");
+  delay(50);
+
+  disp.setNumDigits(NUM_DIGITS);
+  delay(50);
+
   disp.clearDisp();
-  delay(200);
+  delay(50);
 
   Serial.println("Ready!");
   startTime = millis();
+
+  disp.write(score);
 }
 
-void loop() {  
+void loop() {
 
-buttonState = digitalRead(buttonPin);
-//sensorValue = analogRead(sensorPin);
+  buttonState1 = digitalRead(buttonPin1);
+  buttonState2 = digitalRead(buttonPin2);
 
-elapsedTime = millis() - startTime;
-// divide by 1000 to convert to seconds - then cast to an int to print
-if (elapsedTime > 10) {
-    counter += 1;
-    Serial.print( counter );
-    Serial.print(" / ");
-    startTime = millis();
-    Serial.println( (int)(startTime / 1000L));
-    // @TODO blink LED
-    //digitalWrite(13, HIGH);
-    disp.write(counter);
-}
+  sensorValue = digitalRead(sensorPin);
 
-if (buttonState == HIGH) {
-  counter++;
-  //disp.write(counter);
-  Serial.println(counter);
-  delay(50);
-}
+  elapsedTime = millis() - startTime;
 
+  if (sensorValue == LOW) {
+    score++;
+    disp.write(score);
+    Serial.print("Score: ");
+    Serial.println(score);
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    delay(500);
+  }
 
+  if (buttonState1 == LOW || buttonState2 == LOW) {
+    Serial.println("Button Pressed");
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    disp.cyclePins();
+    score = 0;
+    disp.write(score);
+  }
 
-//  disp.clearDisp();
-//  int randInt = random(11, 99);
-//  disp.write(randInt);
-//  delay(10);`
-
-
-//  disp.clearDisp();
-//  delay(100);
-//  disp.write(8);
-//  delay(100);
-
-
+  digitalWrite(buttonLight1, buttonState1);
+  digitalWrite(buttonLight2, buttonState2);
 }
 

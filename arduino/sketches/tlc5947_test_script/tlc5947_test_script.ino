@@ -18,8 +18,8 @@
 #include "Adafruit_TLC5947.h"
 
 // How many boards do you have chained?
-#define NUM_TLC5974 2
-#define NUM_DIGITS 5
+#define NUM_TLC5974 6
+#define NUM_DIGITS 15
 
 //display 1 is 43,42,44 data,clock,latch
 //display 2 is 46,45,47 data,clock,latch
@@ -44,8 +44,8 @@ void loop() {
   setAll(0);
   delay(500);
   
-  //fadeIn(100);
-  delay(500);
+  //fadeIn(50);
+  //delay(500);
   
   setAll(0);
   delay(500);

@@ -4,28 +4,29 @@
 * License:	MIT
 */
 
-#define MAX_PWM 4095
+//#define MAX_PWM 4095
+#define MAX_PWM 2000
 #define MIN_PWM 0
 
 /* PINS FOR REGULAR ARDUINO */
-#define DATA  PD4
-#define CLOCK PD5
-#define LATCH PD6
+// #define DATA  PD4
+// #define CLOCK PD5
+// #define LATCH PD6
 
 /* PINS FOR POP-A-SHOT SHIELD + MEGA */
-// #define DATA  43 
-// #define CLOCK 42 
-// #define LATCH 44 
+#define CLOCK   45
+#define DATA   46
+#define LATCH   47
 
 //  Pull OE pin HIGH to disable TLC
 /* N/A FOR POP-A-SHOT SHIELD */
-#define OE    PD7 // 8
+//#define OE    PD7 // 8
 
 // Toggle pin HIGH to turn off TLC
-#define TLC_DISABLE() (PORTB |= bit(OE))
+//#define TLC_DISABLE() (PORTB |= bit(OE))
 
 // Toggle pin LOW to turn on TLC
-#define TLC_ENABLE()  (PORTB &= ~bit(OE))
+//#define TLC_ENABLE()  (PORTB &= ~bit(OE))
 
 #define DATA_HIGH()   (PORTD |= bit(DATA))
 #define DATA_LOW()    (PORTD &= ~bit(DATA))
@@ -53,9 +54,9 @@ void init_tlc() {
   pinMode(DATA, OUTPUT);
   pinMode(CLOCK, OUTPUT);
   pinMode(LATCH, OUTPUT);
-  pinMode(OE, OUTPUT);
+  //pinMode(OE, OUTPUT);
   LATCH_DISABLE();
-  TLC_DISABLE();
+  //TLC_DISABLE();
 }
 
 inline void tlc_set_pwm(uint16_t chan, uint16_t pwm) {
@@ -132,15 +133,10 @@ void setup() {
   tlc_clear_buff();
   Serial.println("Writing");
   tlc_write();
-  Serial.println("Setting enable");
-  TLC_ENABLE();
+  //Serial.println("Setting enable");
+  //TLC_ENABLE();
 }
 
 void loop() {
-  Serial.println("Effect 1...");
-  heart_effect();
-  delay(1000);
-  Serial.println("Effect 2...");
-  heartbeat_effect();
-  delay(1000);
+  tlc_set_pwm(10, 2000);
 }
