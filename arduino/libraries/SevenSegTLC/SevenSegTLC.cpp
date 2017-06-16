@@ -9,10 +9,11 @@
 #include "SevenSegTLC.h"
 #include "Adafruit_TLC5947.h"
 
+//int maxBrightness = 4095;
 int maxBrightness = 4095;
 
 // @TODO Move this out of library
-Adafruit_TLC5947 tlc = Adafruit_TLC5947(2, 42, 43, 44);
+Adafruit_TLC5947 tlc = Adafruit_TLC5947(6, 45, 46, 47);
 //Adafruit_TLC5947 tlc = Adafruit_TLC5947(2, 5, 4, 6);
 
 
@@ -223,4 +224,20 @@ void SevenSegTLC::applyChanges() {
 
 int SevenSegTLC::pinNum(int digit, int seg) {
     return seg + (digit * _numOfSegments);
+}
+
+void SevenSegTLC::cyclePins() {
+    clearDisp();
+
+    for(int i=0; i<8*_numOfDigits; i++) {
+        tlc.setPWM(i, _segOn);
+        tlc.write();
+    }
+
+    for(int i=8*_numOfDigits; i<0; i--) {
+        tlc.setPWM(i, _segOff);
+        tlc.write();
+    }
+
+    clearDisp();
 }

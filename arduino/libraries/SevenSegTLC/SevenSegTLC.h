@@ -61,6 +61,7 @@ class SevenSegTLC
     void writeClock(int,int);
     void writeClock(int,char);
     void writeClock(int);
+    void cyclePins();
 
     // Timer control functions
     void setTimer(int);

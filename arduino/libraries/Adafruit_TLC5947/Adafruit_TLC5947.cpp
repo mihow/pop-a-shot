@@ -29,26 +29,26 @@ Adafruit_TLC5947::Adafruit_TLC5947(uint16_t n, uint8_t c, uint8_t d, uint8_t l) 
   memset(pwmbuffer, 0, 2*24*n);
 }
 
-//void Adafruit_TLC5947::write(void) {
-//      PORTG &= ~_BV(PG5);
-//  // 24 channels per TLC5974
-//  for (int8_t c=24*numdrivers - 1; c >= 0 ; c--) {
-//    // 12 bits per channel, send MSB first
-//    for (int8_t b=11; b>=0; b--) {
-//      PORTE &= ~_BV(PE3);
-//      
-//      if (pwmbuffer[c] & (1 << b))  
-//      PORTH |= _BV(PH3);
-//      else
-//      PORTH &= ~_BV(PH3);
-//
-//      PORTE |= _BV(PE3);
-//    }
-//  }
-//   PORTE &= ~_BV(PE3);
-//   PORTG |= _BV(PG5);
-//   PORTG &= ~_BV(PG5);
-//}
+void Adafruit_TLC5947::writeFast(void) {
+      PORTG &= ~_BV(PG5);
+  // 24 channels per TLC5974
+  for (int8_t c=24*numdrivers - 1; c >= 0 ; c--) {
+    // 12 bits per channel, send MSB first
+    for (int8_t b=11; b>=0; b--) {
+      PORTE &= ~_BV(PE3);
+      
+      if (pwmbuffer[c] & (1 << b))  
+      PORTH |= _BV(PH3);
+      else
+      PORTH &= ~_BV(PH3);
+
+      PORTE |= _BV(PE3);
+    }
+  }
+   PORTE &= ~_BV(PE3);
+   PORTG |= _BV(PG5);
+   PORTG &= ~_BV(PG5);
+}
 
 void Adafruit_TLC5947::write(void) {
   digitalWrite(_lat, LOW);
