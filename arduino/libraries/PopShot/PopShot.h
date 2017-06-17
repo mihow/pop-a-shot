@@ -6,17 +6,17 @@
 
 class PopShot {
  public:
-  PopShot(uint16_t lane);
+  PopShot(int lane);
 
-  void setPWM(uint16_t chan, uint16_t pwm);
-  uint16_t getPWM(uint16_t chan);
-  void setAll(uint16_t pwm);
+  void setPWM(int chan, int pwm);
+  int getPWM(int chan);
+  void setAll(int pwm);
 
-  uint16_t numPins;
-  uint16_t laneNum;
+  int numPins;
+  int laneNum;
 
  private:
-  uint16_t *pwmbuffer;
+  int *pwmbuffer;
 
 };
 

@@ -1,24 +1,25 @@
 #include <PopShot.h>
 
-PopShot::PopShot(uint16_t lane) {
+PopShot::PopShot(int lane) {
   laneNum = lane;
   numPins = 4;
 
-  pwmbuffer = (uint16_t *)malloc(numPins);
-  memset(pwmbuffer, 0, numPins);
+  //pwmbuffer = (int *)malloc(numPins);
+  //memset(pwmbuffer, 0, numPins);
+  pwmbuffer[numPins];
 }
 
-void PopShot::setAll(uint16_t pwm) {
+void PopShot::setAll(int pwm) {
   //for (int16_t c=24*numdrivers - 1; c >= 0 ; c--) {
-  for(uint16_t c=0; c<numPins; c++) {
+  for(int c=0; c<numPins; c++) {
       pwmbuffer[c] = pwm;
   }
 }
 
-void PopShot::setPWM(uint16_t chan, uint16_t pwm) {
+void PopShot::setPWM(int chan, int pwm) {
   pwmbuffer[chan] = pwm;  
 }
 
-uint16_t PopShot::getPWM(uint16_t chan) {
+int PopShot::getPWM(int chan) {
   return pwmbuffer[chan];
 }
