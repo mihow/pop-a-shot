@@ -8,17 +8,37 @@
 #include "Arduino.h"
 #include "SevenSeg.h"
 
-//int maxBrightness = 4095;
-int maxBrightness = 4095;
-
 
 // Constructor
-SevenSeg::SevenSeg(int A,int B,int C,int D,int E,int F,int G){
+SevenSeg::SevenSeg(int numDigits, int offset, int brightness){
 
   // Assume Common Anode (user must change this if false)
   setCommonAnode();
 
   // Set segment pins
+  _A=6;
+  _B=7;
+  _C=2;
+  _D=1;
+  _E=0;
+  _F=5;
+  _G=4;
+  _DP=-1;	// DP initially not assigned
+
+  _numOfDigits = numDigits;
+  _numOfSegments = 8; // Including dot
+  _maxBrightness = brightness; // 4095
+  _totalPins = _numOfSegments * _numOfDigits;
+
+  numPinsOffset = offset; // 0
+
+  _pinStates = (int *)malloc(2 * _totalPins);
+  memset(_pinStates, 0, 2 * _totalPins);
+
+  clear();
+}
+
+void SevenSeg::setPinPlacements(int A,int B,int C,int D,int E,int F,int G){
   _A=A;
   _B=B;
   _C=C;
@@ -27,52 +47,36 @@ SevenSeg::SevenSeg(int A,int B,int C,int D,int E,int F,int G){
   _F=F;
   _G=G;
   _DP=-1;	// DP initially not assigned
-
-  // Assume no digit pins are used (i.e. it's only one hardwired digit)
-  _numOfDigits=0;
-  _numOfSegments=8; // Including dot
-
-  // Clear display
-  clearDisp();
 }
 
 void SevenSeg::setCommonAnode(){
-  _segOn=maxBrightness;
+  _segOn=_maxBrightness;
   _segOff=0;
 }
 
 void SevenSeg::setCommonCathode(){
   _segOn=0;
-  _segOff=maxBrightness;
+  _segOff=_maxBrightness;
 }
 
-void SevenSeg::clearDisp(){
+void SevenSeg::clear(){
 
   // Serial.println("");
   // Serial.println("Clearing Display");
 
   for(int i=0;i<_numOfDigits;i++){
-    writeSeg(i, _A, _segOff);
-    writeSeg(i, _B, _segOff);
-    writeSeg(i, _C, _segOff);
-    writeSeg(i, _D, _segOff);
-    writeSeg(i, _E, _segOff);
-    writeSeg(i, _F, _segOff);
-    writeSeg(i, _G, _segOff);
+    setSeg(i, _A, _segOff);
+    setSeg(i, _B, _segOff);
+    setSeg(i, _C, _segOff);
+    setSeg(i, _D, _segOff);
+    setSeg(i, _E, _segOff);
+    setSeg(i, _F, _segOff);
+    setSeg(i, _G, _segOff);
   }
 
-  applyChanges();
-
 }
 
-void SevenSeg::setNumDigits(int numOfDigits){
-  _numOfDigits=numOfDigits;
-
-  // Serial.print("New display with this many digits: ");
-  // Serial.println(_numOfDigits);
-}
-
-void SevenSeg::write(int num){
+void SevenSeg::set(int num){
 
     // Serial.println("");
     // Serial.print("Showing number: ");
@@ -81,16 +85,16 @@ void SevenSeg::write(int num){
     for(int i=_numOfDigits-1;i>=0;i--){
         int nextPiece = num % 10L;
         if(num || i==_numOfDigits-1){
-            writeDigit(i, nextPiece);
+            setDigit(i, nextPiece);
         } else {
             // Fill digits with zero
-            writeDigit(i, 0);
+            setDigit(i, 0);
         }
         num /= 10;
     }
 }
 
-void SevenSeg::writeDigit(int digit, int num){
+void SevenSeg::setDigit(int digit, int num){
 
   if (digit > _numOfDigits) {
       
@@ -104,128 +108,119 @@ void SevenSeg::writeDigit(int digit, int num){
       //Serial.println(num);
 
       // Turn off all LEDs
-      writeSeg(digit, _A, _segOff);
-      writeSeg(digit, _B, _segOff);
-      writeSeg(digit, _C, _segOff);
-      writeSeg(digit, _D, _segOff);
-      writeSeg(digit, _E, _segOff);
-      writeSeg(digit, _F, _segOff);
-      writeSeg(digit, _G, _segOff);
+      setSeg(digit, _A, _segOff);
+      setSeg(digit, _B, _segOff);
+      setSeg(digit, _C, _segOff);
+      setSeg(digit, _D, _segOff);
+      setSeg(digit, _E, _segOff);
+      setSeg(digit, _F, _segOff);
+      setSeg(digit, _G, _segOff);
       
       if(num==1){
-        writeSeg(digit, _B, _segOn);
-        writeSeg(digit, _C, _segOn);
+        setSeg(digit, _B, _segOn);
+        setSeg(digit, _C, _segOn);
       }                     
                             
       if(num==2){       
-        writeSeg(digit, _A, _segOn);
-        writeSeg(digit, _B, _segOn);
-        writeSeg(digit, _G, _segOn);
-        writeSeg(digit, _E, _segOn);
-        writeSeg(digit, _D, _segOn);
+        setSeg(digit, _A, _segOn);
+        setSeg(digit, _B, _segOn);
+        setSeg(digit, _G, _segOn);
+        setSeg(digit, _E, _segOn);
+        setSeg(digit, _D, _segOn);
       }                     
                             
       if(num==3){       
-        writeSeg(digit, _A, _segOn);
-        writeSeg(digit, _B, _segOn);
-        writeSeg(digit, _G, _segOn);
-        writeSeg(digit, _C, _segOn);
-        writeSeg(digit, _D, _segOn);
+        setSeg(digit, _A, _segOn);
+        setSeg(digit, _B, _segOn);
+        setSeg(digit, _G, _segOn);
+        setSeg(digit, _C, _segOn);
+        setSeg(digit, _D, _segOn);
       }                     
                             
       if(num==4){       
-        writeSeg(digit, _F, _segOn);
-        writeSeg(digit, _G, _segOn);
-        writeSeg(digit, _B, _segOn);
-        writeSeg(digit, _C, _segOn);
+        setSeg(digit, _F, _segOn);
+        setSeg(digit, _G, _segOn);
+        setSeg(digit, _B, _segOn);
+        setSeg(digit, _C, _segOn);
       }                     
                             
       if(num==5){       
-        writeSeg(digit, _A, _segOn);
-        writeSeg(digit, _F, _segOn);
-        writeSeg(digit, _G, _segOn);
-        writeSeg(digit, _C, _segOn);
-        writeSeg(digit, _D, _segOn);
+        setSeg(digit, _A, _segOn);
+        setSeg(digit, _F, _segOn);
+        setSeg(digit, _G, _segOn);
+        setSeg(digit, _C, _segOn);
+        setSeg(digit, _D, _segOn);
       }                     
                             
       if(num==6){       
-        writeSeg(digit, _A, _segOn);
-        writeSeg(digit, _F, _segOn);
-        writeSeg(digit, _E, _segOn);
-        writeSeg(digit, _D, _segOn);
-        writeSeg(digit, _C, _segOn);
-        writeSeg(digit, _G, _segOn);
+        setSeg(digit, _A, _segOn);
+        setSeg(digit, _F, _segOn);
+        setSeg(digit, _E, _segOn);
+        setSeg(digit, _D, _segOn);
+        setSeg(digit, _C, _segOn);
+        setSeg(digit, _G, _segOn);
       }                     
                             
       if(num==7){       
-        writeSeg(digit, _A, _segOn);
-        writeSeg(digit, _B, _segOn);
-        writeSeg(digit, _C, _segOn);
+        setSeg(digit, _A, _segOn);
+        setSeg(digit, _B, _segOn);
+        setSeg(digit, _C, _segOn);
       }                     
                             
       if(num==8){       
-        writeSeg(digit, _A, _segOn);
-        writeSeg(digit, _B, _segOn);
-        writeSeg(digit, _C, _segOn);
-        writeSeg(digit, _D, _segOn);
-        writeSeg(digit, _E, _segOn);
-        writeSeg(digit, _F, _segOn);
-        writeSeg(digit, _G, _segOn);
+        setSeg(digit, _A, _segOn);
+        setSeg(digit, _B, _segOn);
+        setSeg(digit, _C, _segOn);
+        setSeg(digit, _D, _segOn);
+        setSeg(digit, _E, _segOn);
+        setSeg(digit, _F, _segOn);
+        setSeg(digit, _G, _segOn);
       }                     
                             
       if(num==9){       
-        writeSeg(digit, _G, _segOn);
-        writeSeg(digit, _F, _segOn);
-        writeSeg(digit, _A, _segOn);
-        writeSeg(digit, _B, _segOn);
-        writeSeg(digit, _C, _segOn);
-        writeSeg(digit, _D, _segOn);
+        setSeg(digit, _G, _segOn);
+        setSeg(digit, _F, _segOn);
+        setSeg(digit, _A, _segOn);
+        setSeg(digit, _B, _segOn);
+        setSeg(digit, _C, _segOn);
+        setSeg(digit, _D, _segOn);
       }                     
                             
       if(num==0){       
-        writeSeg(digit, _A, _segOn);
-        writeSeg(digit, _B, _segOn);
-        writeSeg(digit, _C, _segOn);
-        writeSeg(digit, _D, _segOn);
-        writeSeg(digit, _E, _segOn);
-        writeSeg(digit, _F, _segOn);
+        setSeg(digit, _A, _segOn);
+        setSeg(digit, _B, _segOn);
+        setSeg(digit, _C, _segOn);
+        setSeg(digit, _D, _segOn);
+        setSeg(digit, _E, _segOn);
+        setSeg(digit, _F, _segOn);
       }
 
-      applyChanges();
   }
       
 }
 
-void SevenSeg::writeSeg(int digit, int seg, int pwm_val) {
+void SevenSeg::setSeg(int digit, int seg, int pwm_val) {
       //Serial.print("        Setting pin '");
       //Serial.print(pinNum(digit, seg));
       //Serial.print("' to: ");
       //Serial.println(pwm_val);
 
       //tlc.setPWM(pinNum(digit, seg), pwm_val);
+      _pinStates[pinNum(digit, seg), pwm_val];
 }
 
-void SevenSeg::applyChanges() {
-    //Serial.println("Writing all changes");
-    //tlc.write();
+int SevenSeg::getNumPins() {
+    return _totalPins;
 }
 
 int SevenSeg::pinNum(int digit, int seg) {
     return seg + (digit * _numOfSegments);
 }
 
-void SevenSeg::cyclePins() {
-    clearDisp();
+int SevenSeg::getPinState(int pin) {
+    return _pinStates[pin];
+}
 
-    for(int i=0; i<8*_numOfDigits; i++) {
-        //tlc.setPWM(i, _segOn);
-        //tlc.write();
-    }
-
-    for(int i=8*_numOfDigits; i<0; i--) {
-        //tlc.setPWM(i, _segOff);
-        //tlc.write();
-    }
-
-    clearDisp();
+int * SevenSeg::getPinStates() {
+    return _pinStates;
 }

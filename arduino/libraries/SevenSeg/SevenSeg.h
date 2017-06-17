@@ -16,52 +16,42 @@ class SevenSeg
   public:
 
     // Constructor
-    SevenSeg(int,int,int,int,int,int,int);
+    SevenSeg(int,int,int);
 
     // Low level functions for initializing hardware
     void setCommonAnode();
     void setCommonCathode();
-    void setNumDigits(int);
     void setActivePinState(int,int);
-    void setDPPin(int);
-    void setColonPin(int);
-    void setSymbPins(int,int,int,int);
+    void setPinPlacements(int,int,int,int,int,int,int);
+    int numPinsOffset;
 
     // Low level functions for printing to display
-    void clearDisp();
+    void clear();
     void changeDigit(int);
     void changeDigit(char);
-    void writeDigit(int, int);
-    void writeDigit(char);
-    void writeSeg(int, int, int);
-    int  pinNum(int, int);
-    void applyChanges();
+    void setDigit(int, int);
+    void setDigit(char);
+    void setSeg(int, int, int);
     void setDP();
     void clearDP();
-    void setColon();
-    void clearColon();
-    void setApos();
-    void clearApos();
-
-    // Low level functions for controlling multiplexing
-    void setDigitDelay(long int);	// Should I have this function?
-    void setRefreshRate(int);
-    void setDutyCycle(int);
+    int  pinNum(int, int);
+    int  getNumPins();
+    int  getPinState(int);
+    int  *getPinStates();
 
     // High level functions for printing to display
-    void write(long int);
-    void write(int);
-    void write(long int,int);
-    void write(int, int);
-    void write(char*);
-    void write(String);
-    void write(double);
-    void write(double num, int point);
-    void writeClock(int,int,char);
-    void writeClock(int,int);
-    void writeClock(int,char);
-    void writeClock(int);
-    void cyclePins();
+    void set(long int);
+    void set(int);
+    void set(long int,int);
+    void set(int, int);
+    void set(char*);
+    void set(String);
+    void set(double);
+    void set(double num, int point);
+    void setClock(int,int,char);
+    void setClock(int,int);
+    void setClock(int,char);
+    void setClock(int);
 
     // Timer control functions
     void setTimer(int);
@@ -86,41 +76,17 @@ class SevenSeg
     int _G;
     int _DP;	// -1 when decimal point not assigned
 
-    // Variables used for colon and apostrophe symbols
-    int _colonState;	// Whether colon is on (_segOn) or off (_segOff).
-    int _aposState;	// Whether apostorphe is on (_segOn) or off (_segOff).
-    int _colonSegPin;
-    int _colonSegLPin;
-    int _aposSegPin;
-    int _symbDigPin;
-
-    /* The colon/apostrophe handling needs some further explanation:
-     *
-     * colonSegPin is the segment pin for colon. I.e. some displays have a separate segment for colon on one of the digits.
-     * others have colon split across two digits: i.e. the upper part has a separate segment on one digit, whereas the lower
-     * part has uses the same segment pin but on another digit. It is assumed that this segment pin is only used for colon,
-     * and it is stored into colonSegPin by setColonPin(int). The functions setColon() and clearColon() turns on/off this pin,
-     * respectively.
-     *
-     * On some displays, colon is one or two separate free-standing LED(s) with its own cathode and anode. In case of common
-     * cathode, ground the cathod and treat the anode(s) as a segment pin. The other way around in case of common anode. This
-     * should make the method described above applicable.
-     *
-     * On other displays, the upper colon part, the lower colon part, as well as an apostrophe, shares segments with the usual
-     * segments (i.e. segments A, B and C) but is treated as a separate symbol digit that must be multiplexed along with the
-     * other digits. In this case the function setSymbPins(int,int,int,int) is used to assign a pin to that digit, stored in
-     * symbDigPin. The pin corresponding to the upper colon segment is stored in colonSegPin, whereas the lower colon segment
-     * is stored in colonSegLPin. aposSegPin holds the segment pin for the apostrophe. symbDigPin being unequal to -1 is an
-     * indication for multiplexing-related functions that it must multiplex over _numOfDigits+1 digit pins. In this case, the
-     * setColon(), clearColon(), setApos() and clearApos() does not directly influence the pin, but the variable colonState and
-     * aposState. In this case, the digit must be changed to the symbol digit by issuing changeDigit('s') in order to show the
-     * symbols.
-     */
+    // PWM value for "seg on"
+    int _maxBrightness;
 
     // The pins for each of the digits
     int *_dig;
     int _numOfDigits;
     int _numOfSegments;
+
+    // The pins values for all of the digits in the display
+    int _totalPins;
+    int *_pinStates;
 
     // Timing variables. Stored in microseconds.
     long int _digitDelay;		// How much time spent per display during multiplexing.
