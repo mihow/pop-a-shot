@@ -10,10 +10,7 @@
 
 
 // Constructor
-SevenSeg::SevenSeg(int numDigits, int offset, int brightness){
-
-  // Assume Common Anode (user must change this if false)
-  setCommonAnode();
+SevenSeg::SevenSeg(int digits, int offset, int brightness){
 
   // Set segment pins
   _A=6;
@@ -25,15 +22,18 @@ SevenSeg::SevenSeg(int numDigits, int offset, int brightness){
   _G=4;
   _DP=-1;	// DP initially not assigned
 
-  _numOfDigits = numDigits;
-  _numOfSegments = 8; // Including dot
-  _maxBrightness = brightness; // 4095
-  _totalPins = _numOfSegments * _numOfDigits;
+  numDigits = digits;
+  numSegments = 8; // Including dot
+  totalPins = numSegments * numDigits;
 
   numPinsOffset = offset; // 0
 
-  _pinStates = (int *)malloc(2 * _totalPins);
-  memset(_pinStates, 0, 2 * _totalPins);
+  // Assume Common Anode (user must change this if false)
+  _segOn=brightness;
+  _segOff=0;
+
+  pinStates = (uint16_t *)malloc(totalPins);
+  memset(pinStates, 0, totalPins);
 
   clear();
 }
@@ -49,22 +49,12 @@ void SevenSeg::setPinPlacements(int A,int B,int C,int D,int E,int F,int G){
   _DP=-1;	// DP initially not assigned
 }
 
-void SevenSeg::setCommonAnode(){
-  _segOn=_maxBrightness;
-  _segOff=0;
-}
-
-void SevenSeg::setCommonCathode(){
-  _segOn=0;
-  _segOff=_maxBrightness;
-}
-
 void SevenSeg::clear(){
 
   // Serial.println("");
   // Serial.println("Clearing Display");
 
-  for(int i=0;i<_numOfDigits;i++){
+  for(int i=0;i<numDigits;i++){
     setSeg(i, _A, _segOff);
     setSeg(i, _B, _segOff);
     setSeg(i, _C, _segOff);
@@ -78,13 +68,13 @@ void SevenSeg::clear(){
 
 void SevenSeg::set(int num){
 
-    // Serial.println("");
-    // Serial.print("Showing number: ");
-    // Serial.println(num);
+    Serial.println("");
+    Serial.print("Showing number: ");
+    Serial.println(num);
 
-    for(int i=_numOfDigits-1;i>=0;i--){
+    for(int i=numDigits-1;i>=0;i--){
         int nextPiece = num % 10L;
-        if(num || i==_numOfDigits-1){
+        if(num || i==numDigits-1){
             setDigit(i, nextPiece);
         } else {
             // Fill digits with zero
@@ -96,16 +86,16 @@ void SevenSeg::set(int num){
 
 void SevenSeg::setDigit(int digit, int num){
 
-  if (digit > _numOfDigits) {
+  if (digit > numDigits) {
       
       // We don't have enough digits. Cut this number off
       
   } else {
   
-      //Serial.print("    Setting digit '");
-      //Serial.print(digit);
-      //Serial.print("' to: ");
-      //Serial.println(num);
+      Serial.print("    Setting digit '");
+      Serial.print(digit);
+      Serial.print("' to: ");
+      Serial.println(num);
 
       // Turn off all LEDs
       setSeg(digit, _A, _segOff);
@@ -121,7 +111,7 @@ void SevenSeg::setDigit(int digit, int num){
         setSeg(digit, _C, _segOn);
       }                     
                             
-      if(num==2){       
+      else if(num==2){       
         setSeg(digit, _A, _segOn);
         setSeg(digit, _B, _segOn);
         setSeg(digit, _G, _segOn);
@@ -129,7 +119,7 @@ void SevenSeg::setDigit(int digit, int num){
         setSeg(digit, _D, _segOn);
       }                     
                             
-      if(num==3){       
+      else if(num==3){       
         setSeg(digit, _A, _segOn);
         setSeg(digit, _B, _segOn);
         setSeg(digit, _G, _segOn);
@@ -137,14 +127,14 @@ void SevenSeg::setDigit(int digit, int num){
         setSeg(digit, _D, _segOn);
       }                     
                             
-      if(num==4){       
+      else if(num==4){       
         setSeg(digit, _F, _segOn);
         setSeg(digit, _G, _segOn);
         setSeg(digit, _B, _segOn);
         setSeg(digit, _C, _segOn);
       }                     
                             
-      if(num==5){       
+      else if(num==5){       
         setSeg(digit, _A, _segOn);
         setSeg(digit, _F, _segOn);
         setSeg(digit, _G, _segOn);
@@ -152,7 +142,7 @@ void SevenSeg::setDigit(int digit, int num){
         setSeg(digit, _D, _segOn);
       }                     
                             
-      if(num==6){       
+      else if(num==6){       
         setSeg(digit, _A, _segOn);
         setSeg(digit, _F, _segOn);
         setSeg(digit, _E, _segOn);
@@ -161,13 +151,13 @@ void SevenSeg::setDigit(int digit, int num){
         setSeg(digit, _G, _segOn);
       }                     
                             
-      if(num==7){       
+      else if(num==7){       
         setSeg(digit, _A, _segOn);
         setSeg(digit, _B, _segOn);
         setSeg(digit, _C, _segOn);
       }                     
                             
-      if(num==8){       
+      else if(num==8){       
         setSeg(digit, _A, _segOn);
         setSeg(digit, _B, _segOn);
         setSeg(digit, _C, _segOn);
@@ -177,7 +167,7 @@ void SevenSeg::setDigit(int digit, int num){
         setSeg(digit, _G, _segOn);
       }                     
                             
-      if(num==9){       
+      else if(num==9){       
         setSeg(digit, _G, _segOn);
         setSeg(digit, _F, _segOn);
         setSeg(digit, _A, _segOn);
@@ -186,7 +176,7 @@ void SevenSeg::setDigit(int digit, int num){
         setSeg(digit, _D, _segOn);
       }                     
                             
-      if(num==0){       
+      else if(num==0){       
         setSeg(digit, _A, _segOn);
         setSeg(digit, _B, _segOn);
         setSeg(digit, _C, _segOn);
@@ -195,7 +185,14 @@ void SevenSeg::setDigit(int digit, int num){
         setSeg(digit, _F, _segOn);
       }
 
+      else {
+        Serial.print("Unknown number or bad type to print: ");
+        Serial.println(num);
+      }
+
   }
+
+  printPinStates();
       
 }
 
@@ -206,21 +203,21 @@ void SevenSeg::setSeg(int digit, int seg, int pwm_val) {
       //Serial.println(pwm_val);
 
       //tlc.setPWM(pinNum(digit, seg), pwm_val);
-      _pinStates[pinNum(digit, seg), pwm_val];
-}
-
-int SevenSeg::getNumPins() {
-    return _totalPins;
+      int pin = pinNum(digit, seg);
+      pinStates[pin] = pwm_val;
 }
 
 int SevenSeg::pinNum(int digit, int seg) {
-    return seg + (digit * _numOfSegments);
+    return seg + (digit * numSegments);
 }
 
-int SevenSeg::getPinState(int pin) {
-    return _pinStates[pin];
-}
+//int * SevenSeg::getPinStates() {
+//    return pinStates;
+//}
+//
 
-int * SevenSeg::getPinStates() {
-    return _pinStates;
+void SevenSeg::printPinStates() {
+  for(int i=0; i<totalPins; i++) {
+      Serial.print("Pin "); Serial.print(i); Serial.print(": "); Serial.println(pinStates[0]);
+  }
 }
