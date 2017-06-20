@@ -3,14 +3,14 @@
 // How many boards do you have chained?
 #define NUM_TLC5974 2
 
-#define clock   45
-#define data    46
-#define latch   47
+//#define clock   45
+//#define data    46
+//#define latch   47
 
 // Test config for plain Arduino:
-//#define clock   4
-//#define data    5
-//#define latch   6
+#define clock   4
+#define data    5
+#define latch   6
 
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(NUM_TLC5974, clock, data, latch);
 
@@ -19,7 +19,9 @@ int timeTens, timeOnes, pointsHundies, pointsTens, pointsOnes;
 int time = 0;
 int startTime = 45;
 int points = 0;
-int currTimeMillis, timeMillis, prevTimeMillis, prevTesterClockMillis, prevPrintMillis;
+int currTimeMillis, timeMillis, prevTimeMillis, prevTesterClockMillis;
+int prevDebugMillis;
+int sensorOnMillis, shotStartMillis;
 int scoreMillis, prevScoreMillis;
 int startButton, prevStartButton, multiButton, prevMultiButton, sensor, prevSensor;
 int testerMode, prevTesterMode;
@@ -59,18 +61,18 @@ int numbers[10][7] = {{ON, ON, ON, ON, ON, ON, OFF}, //zero
 
 
 
-int startButtonPin = 40;//NOTE THIS IS LOW=TRUE
-int startButtonLight = 7;
-int multiButtonPin = 41;//NOTE THIS IS LOW=TRUE
-int multiButtonLight = 8;
-int sensorPin = 58; //HOOOOOOOOOOP
+//int startButtonPin = 40;//NOTE THIS IS LOW=TRUE
+//int startButtonLight = 7;
+//int multiButtonPin = 41;//NOTE THIS IS LOW=TRUE
+//int multiButtonLight = 8;
+//int sensorPin = 58; //HOOOOOOOOOOP
 
 // Test config for plain Arduino:
-//int startButtonPin = 8;
-//int startButtonLight = 13;
-//int multiButtonPin = -1;
-//int multiButtonLight = -1;
-//int sensorPin = 9; 
+int startButtonPin = 8;
+int startButtonLight = 13;
+int multiButtonPin = -1;
+int multiButtonLight = -1;
+int sensorPin = 9;
 
 
 // Seven Segment Display Pins
@@ -153,87 +155,117 @@ void loop() {
 
   ///////////////PLAYING
   if (mode == 2) {
-    if (sensor != prevSensor) {
-      if (sensor == 1) {
-        scoreMillis = currTimeMillis;
-        if ((scoreMillis - prevScoreMillis) > 500) {
-          prevScoreMillis = scoreMillis;
+    if (sensor == LOW && prevSensor == HIGH) {
+      shotStartMillis = currTimeMillis;
+      prevSensor = LOW;
+    }
+    if (sensor == HIGH && prevSensor == LOW) {
+      sensorOnMillis = currTimeMillis - shotStartMillis;
+      if (sensorOnMillis > 30 && sensorOnMillis < 300) { // Look like a ball passing or noise?
+        Serial.print("+ Sensor on time: "); Serial.println(sensorOnMillis);
+        if (currTimeMillis - prevScoreMillis > 400) { // How fast can consecutive shots be realistically?
+          Serial.println("+ Score!");
+          Serial.print("+ Time since last shot: "); Serial.println(currTimeMillis - prevScoreMillis);
           if (time > 10) {
+            // Two pointer
             points += 2;
           } else {
+            // Three pointers for last 10 seconds
             points += 3;
           }
+          prevScoreMillis = currTimeMillis;
+        } else {
+          // Serial.print("- Ignoring shot, too soon since last one");
         }
-      }
-    }
-
-
-    if ((currTimeMillis - prevTimeMillis) > 1000) {
-      prevTimeMillis = currTimeMillis;
-      if (time > 1) {
-        time -= 1;
       } else {
-        time = 0;
-        mode = 3;
+        // Serial.println("- Ignoring shot, didn't look like a ball (probably net or noise)");
       }
+      prevSensor = HIGH;
+    }
+
+  //  ///////////////PLAYING
+  //  if (mode == 2) {
+  //    if (sensor != prevSensor) {
+  //      if (sensor == 1) {
+  //        scoreMillis = currTimeMillis;
+  //        if ((scoreMillis - prevScoreMillis) > 500) {
+  //          prevScoreMillis = scoreMillis;
+  //          if (time > 10) {
+  //            points += 2;
+  //          } else {
+  //            points += 3;
+  //          }
+  //        }
+  //      }
+  //    }
+
+
+  if ((currTimeMillis - prevTimeMillis) > 1000) {
+    prevTimeMillis = currTimeMillis;
+    if (time > 1) {
+      time -= 1;
+    } else {
+      time = 0;
+      mode = 3;
     }
   }
+}
 
 
-  ///////////////GAME OVER
-  if (mode == 3) {
-    if ((currTimeMillis - prevTimeMillis) > 1000) {
-      prevTimeMillis = currTimeMillis;
-      mode = 0;
-    }
+///////////////GAME OVER
+if (mode == 3) {
+  if ((currTimeMillis - prevTimeMillis) > 1000) {
+    prevTimeMillis = currTimeMillis;
+    mode = 0;
   }
+}
 
 
 
-  if (mode != 9) {
-    timeOnes = time % 10;
-    timeTens = (time - timeOnes) / 10;
+if (mode != 9) {
+  timeOnes = time % 10;
+  timeTens = (time - timeOnes) / 10;
 
-    pointsOnes = points % 10;
-    pointsTens = ((points - pointsOnes) / 10) % 10;
-    pointsHundies = ((points - (pointsTens + pointsOnes)) / 100) % 10;
+  pointsOnes = points % 10;
+  pointsTens = ((points - pointsOnes) / 10) % 10;
+  pointsHundies = ((points - (pointsTens + pointsOnes)) / 100) % 10;
+}
+/*
+  //the following was very useful for debugging, just comment out the above lines that define points and
+  //the points tlcs can be used to show mode, multiBUtton etc..
+  pointsOnes = mode%10;
+  pointsTens = multiButton;
+  pointsHundies = someoneElsePressedMulti;
+*/
+
+writeDisplay();
+
+//  digitalWrite(t1a, numbers[timeTens][0]);  digitalWrite(t1b, numbers[timeTens][1]);  digitalWrite(t1c, numbers[timeTens][2]);  digitalWrite(t1d, numbers[timeTens][3]);  digitalWrite(t1e, numbers[timeTens][4]);  digitalWrite(t1f, numbers[timeTens][5]);  digitalWrite(t1g, numbers[timeTens][6]);
+//  digitalWrite(t2a, numbers[timeOnes][0]);  digitalWrite(t2b, numbers[timeOnes][1]);  digitalWrite(t2c, numbers[timeOnes][2]);  digitalWrite(t2d, numbers[timeOnes][3]);  digitalWrite(t2e, numbers[timeOnes][4]);  digitalWrite(t2f, numbers[timeOnes][5]);  digitalWrite(t2g, numbers[timeOnes][6]);
+//  digitalWrite(p1a, numbers[pointsHundies][0]);  digitalWrite(p1b, numbers[pointsHundies][1]);  digitalWrite(p1c, numbers[pointsHundies][2]);  digitalWrite(p1d, numbers[pointsHundies][3]);  digitalWrite(p1e, numbers[pointsHundies][4]);  digitalWrite(p1f, numbers[pointsHundies][5]);  digitalWrite(p1g, numbers[pointsHundies][6]);
+//  digitalWrite(p2a, numbers[pointsTens][0]);  digitalWrite(p2b, numbers[pointsTens][1]);  digitalWrite(p2c, numbers[pointsTens][2]);  digitalWrite(p2d, numbers[pointsTens][3]);  digitalWrite(p2e, numbers[pointsTens][4]);  digitalWrite(p2f, numbers[pointsTens][5]);  digitalWrite(p2g, numbers[pointsTens][6]);
+//  digitalWrite(p3a, numbers[pointsOnes][0]);  digitalWrite(p3b, numbers[pointsOnes][1]);  digitalWrite(p3c, numbers[pointsOnes][2]);  digitalWrite(p3d, numbers[pointsOnes][3]);  digitalWrite(p3e, numbers[pointsOnes][4]);  digitalWrite(p3f, numbers[pointsOnes][5]);  digitalWrite(p3g, numbers[pointsOnes][6]);
+//
+
+/*
+  if((currTimeMillis - prevTimeMillis) > 500){
+  number = (number + 1) % 1000;
+
   }
-  /*
-    //the following was very useful for debugging, just comment out the above lines that define points and
-    //the points tlcs can be used to show mode, multiBUtton etc..
-    pointsOnes = mode%10;
-    pointsTens = multiButton;
-    pointsHundies = someoneElsePressedMulti;
-  */
+*/
+prevSensor = sensor;
+prevStartButton = startButton;
+prevMultiButton = multiButton;
+prevTesterMode = testerMode;
 
-  writeDisplay();
-
-  //  digitalWrite(t1a, numbers[timeTens][0]);  digitalWrite(t1b, numbers[timeTens][1]);  digitalWrite(t1c, numbers[timeTens][2]);  digitalWrite(t1d, numbers[timeTens][3]);  digitalWrite(t1e, numbers[timeTens][4]);  digitalWrite(t1f, numbers[timeTens][5]);  digitalWrite(t1g, numbers[timeTens][6]);
-  //  digitalWrite(t2a, numbers[timeOnes][0]);  digitalWrite(t2b, numbers[timeOnes][1]);  digitalWrite(t2c, numbers[timeOnes][2]);  digitalWrite(t2d, numbers[timeOnes][3]);  digitalWrite(t2e, numbers[timeOnes][4]);  digitalWrite(t2f, numbers[timeOnes][5]);  digitalWrite(t2g, numbers[timeOnes][6]);
-  //  digitalWrite(p1a, numbers[pointsHundies][0]);  digitalWrite(p1b, numbers[pointsHundies][1]);  digitalWrite(p1c, numbers[pointsHundies][2]);  digitalWrite(p1d, numbers[pointsHundies][3]);  digitalWrite(p1e, numbers[pointsHundies][4]);  digitalWrite(p1f, numbers[pointsHundies][5]);  digitalWrite(p1g, numbers[pointsHundies][6]);
-  //  digitalWrite(p2a, numbers[pointsTens][0]);  digitalWrite(p2b, numbers[pointsTens][1]);  digitalWrite(p2c, numbers[pointsTens][2]);  digitalWrite(p2d, numbers[pointsTens][3]);  digitalWrite(p2e, numbers[pointsTens][4]);  digitalWrite(p2f, numbers[pointsTens][5]);  digitalWrite(p2g, numbers[pointsTens][6]);
-  //  digitalWrite(p3a, numbers[pointsOnes][0]);  digitalWrite(p3b, numbers[pointsOnes][1]);  digitalWrite(p3c, numbers[pointsOnes][2]);  digitalWrite(p3d, numbers[pointsOnes][3]);  digitalWrite(p3e, numbers[pointsOnes][4]);  digitalWrite(p3f, numbers[pointsOnes][5]);  digitalWrite(p3g, numbers[pointsOnes][6]);
-  //
-
-  /*
-    if((currTimeMillis - prevTimeMillis) > 500){
-    number = (number + 1) % 1000;
-
-    }
-  */
-  prevSensor = sensor;
-  prevStartButton = startButton;
-  prevMultiButton = multiButton;
-  prevTesterMode = testerMode;
-
-  // Print the state of things
-  if((currTimeMillis - prevPrintMillis) > 1000){
-    Serial.print("Mode:   "); Serial.println(mode);
-    Serial.print("Time:   "); Serial.println(time);
-    Serial.print("Points: "); Serial.println(points);
-    Serial.println();
-    prevPrintMillis = millis();
-  }
+// Print the state of things
+if ((currTimeMillis - prevDebugMillis) > 1000) {
+  Serial.print("Mode:   "); Serial.println(mode);
+  Serial.print("Time:   "); Serial.println(time);
+  Serial.print("Points: "); Serial.println(points);
+  Serial.println();
+  prevDebugMillis = millis();
+}
 
 }
 
