@@ -1,16 +1,16 @@
 #include "Adafruit_TLC5947.h"
 
 // How many boards do you have chained?
-#define NUM_TLC5974 2
+#define NUM_TLC5974 6
 
-//#define clock   45
-//#define data    46
-//#define latch   47
+#define clock   45
+#define data    46
+#define latch   47
 
-// Test config for plain Arduino:
-#define clock   4
-#define data    5
-#define latch   6
+//// Test config for plain Arduino:
+//#define clock   4
+//#define data    5
+//#define latch   6
 
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(NUM_TLC5974, clock, data, latch);
 
@@ -35,7 +35,8 @@ int mode = 0; //0 = waiting, 1= start button pressed, 2 = playing, 3 = game over
 int ON = 4095;
 int OFF = 0;
 
-int numbers[10][7] = {{ON, ON, ON, ON, ON, ON, OFF}, //zero
+int numbers[10][7] = {
+  {ON, ON, ON, ON, ON, ON, OFF}, //zero
   {OFF, ON, ON, OFF, OFF, OFF, OFF}, //one
   {ON, ON, OFF, ON, ON, OFF, ON}, //two
   {ON, ON, ON, ON, OFF, OFF, ON}, //three
@@ -44,8 +45,8 @@ int numbers[10][7] = {{ON, ON, ON, ON, ON, ON, OFF}, //zero
   {ON, OFF, ON, ON, ON, ON, ON}, //six
   {ON, ON, ON, OFF, OFF, OFF, OFF}, //seven
   {ON, ON, ON, ON, ON, ON, ON}, //eight
-  {ON, ON, ON, OFF, OFF, ON, ON}
-};//niner
+  {ON, ON, ON, OFF, OFF, ON, ON} //niner
+};
 
 
 //int numbers[10][7] = {{1,1,1,1,1,1,0},//zero
@@ -60,19 +61,36 @@ int numbers[10][7] = {{ON, ON, ON, ON, ON, ON, OFF}, //zero
 //                      {1,1,1,0,0,1,1}};//niner
 
 
+// Hoop 4
+// int displaySet = 0; // Hoop 4 = 0, Hoop 3 = 1, Hoop 2 = 2, Hoop 1 = 3;
+// int startButtonPin = 41;//NOTE THIS IS LOW=TRUE
+// int startButtonLight = 8;
+// int multiButtonPin = 40;//NOTE THIS IS LOW=TRUE
+// int multiButtonLight = 7;
+// int sensorPin = 58; //HOOOOOOOOOOP
 
-//int startButtonPin = 40;//NOTE THIS IS LOW=TRUE
-//int startButtonLight = 7;
-//int multiButtonPin = 41;//NOTE THIS IS LOW=TRUE
-//int multiButtonLight = 8;
-//int sensorPin = 58; //HOOOOOOOOOOP
+// Hoop 3
+int displaySet = 1;
+int startButtonPin = 38;
+int startButtonLight = 6;
+int multiButtonPin = 37;
+int multiButtonLight = 9;
+int sensorPin = 59;
 
-// Test config for plain Arduino:
-int startButtonPin = 8;
-int startButtonLight = 13;
-int multiButtonPin = -1;
-int multiButtonLight = -1;
-int sensorPin = 9;
+// Hoop 2
+// int displaySet = 2;
+// int startButtonPin = 9999;
+// int startButtonLight = 9999;
+// int multiButtonPin = 9999;
+// int multiButtonLight = 9999;
+// int sensorPin = 57;
+
+//// Test config for plain Arduino:
+//int startButtonPin = 8;
+//int startButtonLight = 13;
+//int multiButtonPin = -1;
+//int multiButtonLight = -1;
+//int sensorPin = 9;
 
 
 // Seven Segment Display Pins
@@ -85,20 +103,23 @@ int segF = 5;
 int segG = 4;
 int segDot = -1; // Dot not used
 
+int pinsPerDisplaySet = 8*6;
+int offset = displaySet * pinsPerDisplaySet;
+
 // Digit 5 // Timer digit 2 // Tens
-int t1a = segA + (8 * 4); int t1b = segB + (8 * 4); int t1c = segC + (8 * 4); int t1d = segD + (8 * 4); int t1e =  segE + (8 * 4); int t1f = segF + (8 * 4); int t1g = segG + (8 * 4); //time tens
+int t1a = segA + (8 * 4) + offset; int t1b = segB + (8 * 4) + offset; int t1c = segC + (8 * 4) + offset; int t1d = segD + (8 * 4) + offset; int t1e =  segE + (8 * 4) + offset; int t1f = segF + (8 * 4) + offset; int t1g = segG + (8 * 4) + offset; //time tens
 
 // Digit 4 // Timer digit 1 // Ones
-int t2a = segA + (8 * 3); int t2b = segB + (8 * 3); int t2c = segC + (8 * 3); int t2d = segD + (8 * 3); int t2e = segE + (8 * 3); int t2f = segF + (8 * 3); int t2g = segG + (8 * 3); //time ones
+int t2a = segA + (8 * 3) + offset; int t2b = segB + (8 * 3) + offset; int t2c = segC + (8 * 3) + offset; int t2d = segD + (8 * 3) + offset; int t2e = segE + (8 * 3) + offset; int t2f = segF + (8 * 3) + offset; int t2g = segG + (8 * 3) + offset; //time ones
 
 // Digit 3 // Points digit 3 // Hundies
-int p1a = segA + (8 * 2); int p1b = segB + (8 * 2); int p1c = segC + (8 * 2); int p1d = segD + (8 * 2); int p1e = segE + (8 * 2); int p1f = segF + (8 * 2); int p1g = segG + (8 * 2); //points hundies
+int p1a = segA + (8 * 2) + offset; int p1b = segB + (8 * 2) + offset; int p1c = segC + (8 * 2) + offset; int p1d = segD + (8 * 2) + offset; int p1e = segE + (8 * 2) + offset; int p1f = segF + (8 * 2) + offset; int p1g = segG + (8 * 2) + offset; //points hundies
 
 // Digit 2 // Points digit 2 // Tens
-int p2a = segA + (8 * 1); int p2b = segB + (8 * 1); int p2c = segC + (8 * 1); int p2d = segD + (8 * 1); int p2e = segE + (8 * 1); int p2f = segF + (8 * 1); int p2g = segG + (8 * 1); //points tens
+int p2a = segA + (8 * 1) + offset; int p2b = segB + (8 * 1) + offset; int p2c = segC + (8 * 1) + offset; int p2d = segD + (8 * 1) + offset; int p2e = segE + (8 * 1) + offset; int p2f = segF + (8 * 1) + offset; int p2g = segG + (8 * 1) + offset; //points tens
 
 // Digit 1 // Points digit 1 // Ones
-int p3a = segA + (8 * 0); int p3b = segB + (8 * 0); int p3c = segC + (8 * 0); int p3d = segD + (8 * 0); int p3e = segE + (8 * 0); int p3f = segF + (8 * 0); int p3g = segG + (8 * 0); //points ones
+int p3a = segA + (8 * 0) + offset; int p3b = segB + (8 * 0) + offset; int p3c = segC + (8 * 0) + offset; int p3d = segD + (8 * 0) + offset; int p3e = segE + (8 * 0) + offset; int p3f = segF + (8 * 0) + offset; int p3g = segG + (8 * 0) + offset; //points ones
 
 
 
@@ -108,7 +129,7 @@ void setup() {
   Serial.println("Setting Up");
   tlc.begin();
 
-  pinMode(startButtonPin, INPUT); pinMode(multiButtonPin, INPUT_PULLUP); pinMode(sensorPin, INPUT);
+  pinMode(startButtonPin, INPUT_PULLUP); pinMode(multiButtonPin, INPUT_PULLUP); pinMode(sensorPin, INPUT);
   pinMode(startButtonLight, OUTPUT); pinMode(multiButtonLight, OUTPUT);
 
   digitalWrite(startButtonLight, HIGH);
@@ -128,8 +149,8 @@ void loop() {
   multiButton = digitalRead(multiButtonPin);
   sensor = digitalRead(sensorPin);
 
-  digitalWrite(startButtonLight, !startButton);
-  digitalWrite(multiButtonLight, !multiButton);
+  digitalWrite(startButtonLight, startButton);
+  digitalWrite(multiButtonLight, multiButton);
 
   ///////WAITING
   if (mode == 0) {
@@ -161,8 +182,8 @@ void loop() {
     }
     if (sensor == HIGH && prevSensor == LOW) {
       sensorOnMillis = currTimeMillis - shotStartMillis;
-      if (sensorOnMillis > 30 && sensorOnMillis < 300) { // Look like a ball passing or noise?
-        Serial.print("+ Sensor on time: "); Serial.println(sensorOnMillis);
+      Serial.print("+ Sensor on time: "); Serial.println(sensorOnMillis);
+      if (sensorOnMillis > 20 && sensorOnMillis < 300) { // Look like a ball passing or noise?
         if (currTimeMillis - prevScoreMillis > 400) { // How fast can consecutive shots be realistically?
           Serial.println("+ Score!");
           Serial.print("+ Time since last shot: "); Serial.println(currTimeMillis - prevScoreMillis);
