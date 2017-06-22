@@ -19,14 +19,15 @@ int timeTens, timeOnes, pointsHundies, pointsTens, pointsOnes;
 int time = 0;
 int startTime = 45;
 int points = 0;
-int currTimeMillis, timeMillis, prevTimeMillis, prevTesterClockMillis;
+int currTimeMillis, timeMillis, prevTimeMillis;
 int prevDebugMillis;
 int sensorOnMillis, shotStartMillis;
 int scoreMillis, prevScoreMillis;
 int startButton, prevStartButton, multiButton, prevMultiButton, sensor, prevSensor;
-int testerMode, prevTesterMode;
 int timeBetweenShots = 300;
-int testerClock = 0;
+
+char serialInput;
+
 
 int mode = 0; //0 = waiting, 1= start button pressed, 2 = playing, 3 = game over, 4 = you have pressed MULTI, 5 = someone else has pressed MULTI,
 //6 = you and someone else have pressed multi, 7 = you have released multi but someone else is still holding it
@@ -152,6 +153,8 @@ void loop() {
   digitalWrite(startButtonLight, startButton);
   digitalWrite(multiButtonLight, multiButton);
 
+  readSerial();
+
   ///////WAITING
   if (mode == 0) {
     if (startButton == 0) {
@@ -168,7 +171,6 @@ void loop() {
         points = 0;
         prevScoreMillis = currTimeMillis;
         prevTimeMillis = currTimeMillis;
-        prevTesterClockMillis = currTimeMillis;
         time = startTime;
       }
     }
@@ -277,7 +279,6 @@ writeDisplay();
 prevSensor = sensor;
 prevStartButton = startButton;
 prevMultiButton = multiButton;
-prevTesterMode = testerMode;
 
 // Print the state of things
 if ((currTimeMillis - prevDebugMillis) > 1000) {
@@ -297,4 +298,25 @@ void writeDisplay() {
   tlc.setPWM(p2a, numbers[pointsTens][0]);  tlc.setPWM(p2b, numbers[pointsTens][1]);  tlc.setPWM(p2c, numbers[pointsTens][2]);  tlc.setPWM(p2d, numbers[pointsTens][3]);  tlc.setPWM(p2e, numbers[pointsTens][4]);  tlc.setPWM(p2f, numbers[pointsTens][5]);  tlc.setPWM(p2g, numbers[pointsTens][6]);
   tlc.setPWM(p3a, numbers[pointsOnes][0]);  tlc.setPWM(p3b, numbers[pointsOnes][1]);  tlc.setPWM(p3c, numbers[pointsOnes][2]);  tlc.setPWM(p3d, numbers[pointsOnes][3]);  tlc.setPWM(p3e, numbers[pointsOnes][4]);  tlc.setPWM(p3f, numbers[pointsOnes][5]);  tlc.setPWM(p3g, numbers[pointsOnes][6]);
   tlc.write();
+}
+
+void readSerial() {
+  if (Serial.available() > 0) {
+      serialInput = Serial.read();
+      switch ( serialInput ) {
+        case 'S':
+          Serial.println("Starting game\n");
+          mode = 1;
+          startButton = 1;
+          break;
+        case 'P':
+          Serial.println("Cheater!\n");
+          points += 2;
+          break;
+        default:
+          Serial.print("What? Received: ");
+          Serial.println(serialInput);
+          break;
+      }
+  }
 }
