@@ -1,4 +1,3 @@
-#include "Servo.h"
 #include "Adafruit_TLC5947.h"
 #include "Bounce2.h"
  
@@ -234,6 +233,7 @@ void readSerial() {
   if (Serial.available() > 0) {
       serialInput = Serial.read();
       switch ( serialInput ) {
+
         case 'q':
           hoop1.StartGame();
           break;
@@ -243,6 +243,7 @@ void readSerial() {
         case 'e':
           hoop1.PrintStatus();
           break;
+
         case 'a':
           hoop2.StartGame();
           break;
@@ -250,8 +251,9 @@ void readSerial() {
           hoop2.AddPoints();
           break;
         case 'd':
-          hoop1.PrintStatus();
+          hoop2.PrintStatus();
           break;
+
         default:
           Serial.print("What? Received: ");
           Serial.println(serialInput);
