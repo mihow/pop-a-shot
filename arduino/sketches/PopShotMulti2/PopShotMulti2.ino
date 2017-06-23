@@ -4,55 +4,82 @@
  
 class Display
 {
-	// Class Member Variables
-	// These are initialized at startup
-	int ledPin;      // the number of the LED pin
-	long OnTime;     // milliseconds of on-time
-	long OffTime;    // milliseconds of off-time
+	int numDigits;
+    int firstPin;
+    int *pins;
+    int pinsPerDigit = 8;
+    
+    int ON = 4095;
+    int OFF = 0;
  
-	// These maintain the current state
-	int ledState;             		// ledState used to set the LED
-	unsigned long previousMillis;  	// will store last time LED was updated
+	unsigned long previousMillis;
  
-  // Constructor - creates a Display 
-  // and initializes the member variables and state
   public:
-  Display(int pin, long on, long off)
+  int numPins;
+
+  Display()
   {
-	ledPin = pin;
-	pinMode(ledPin, OUTPUT);     
-	  
-	OnTime = on;
-	OffTime = off;
-	
-	ledState = LOW; 
 	previousMillis = 0;
   }
  
+  void Setup(int nd)
+  {
+	numDigits = nd;
+    numPins = numDigits * pinsPerDigit;
+    //int *pins = new int[numPins]();
+
+    // https://arduino.stackexchange.com/questions/3774/how-can-i-declare-an-array-of-variable-size-globally
+	// if (pins != 0) {
+	// 	pins = (int*) realloc(pins, numPins * sizeof(int));
+	// } else {
+	// 	pins = (int*) malloc(numPins * sizeof(int));
+	// }
+    // Allocate array of pin values they way Adafruit_TLC5947 does
+    pins = (int *)malloc(numPins * sizeof(int));
+    memset(pins, 0, numPins * sizeof(int));
+
+    //Serial.println((String)"Pins size: " + sizeof(pins));
+    Clear();
+  }
+
+  void PrintStatus()
+  {
+    for(int i=0; i<numPins; i++) {
+      Serial.print((String)"Pin " + i + ": " + pins[i] + ", ");
+    }
+    Serial.println();
+  }
+
+  void Clear()
+  {
+    for(int i=0; i<numPins; i++) {
+      pins[i] = OFF;
+    }
+  }
+
+  void SetPin(int pin, int val)
+  {
+    pins[pin] = val;
+  }
+
+  int GetPin(int pin)
+  {
+    int val = pins[pin];
+    Serial.println((String)"Pin " + pin + ": " + val);
+  }
+
   void Update()
   {
-    // check to see if it's time to change the state of the LED
     unsigned long currentMillis = millis();
      
-    if((ledState == HIGH) && (currentMillis - previousMillis >= OnTime))
-    {
-      ledState = LOW;  // Turn it off
-      previousMillis = currentMillis;  // Remember the time
-      digitalWrite(ledPin, ledState);  // Update the actual LED
-    }
-    else if ((ledState == LOW) && (currentMillis - previousMillis >= OffTime))
-    {
-      ledState = HIGH;  // turn it on
-      previousMillis = currentMillis;   // Remember the time
-      digitalWrite(ledPin, ledState);	  // Update the actual LED
-    }
+    previousMillis = currentMillis;
   }
 };
  
 class Hoop
 {
-  //Display scoreDisplay;
-  //Display timeDisplay;
+  Display scoreDisplay;
+  Display timerDisplay;
 
   boolean gamePlaying = false;
 
@@ -61,17 +88,40 @@ class Hoop
   int secondsRemaining;
   int gameLength = 45;
 
+  int firstDisplayPin;
+  int sensorPin;
+  int startButtonPin;
+  int multiButtonPin;
+  int startButtonLight;
+  int multiButtonLight;
+
   unsigned long lastTimerUpdate;
  
 public: 
-  Hoop(int l)
+  Hoop(int l, int fp)
   {
     lane = l;
+    firstDisplayPin = fp;
+    // sensorPin = sp;
+    // startButtonPin = sbp;
+    // multiButtonPin = mbp;
+    // startButtonLight = sbl;
+    // multiButtonLight = mbl;
   }
   
   void Setup()
   {
     pinMode(13, OUTPUT); 
+
+    scoreDisplay.Setup(3);
+    timerDisplay.Setup(2);
+
+    scoreDisplay.SetPin(5, 555);
+    timerDisplay.SetPin(8, 888);
+
+    PrintStatus();
+    scoreDisplay.PrintStatus();
+    timerDisplay.PrintStatus();
   }
   
   void Update()
@@ -101,7 +151,6 @@ public:
   {
     gamePlaying = false;  
     Serial.println((String)"Hoop " + lane + ": GAME OVER!");
-    PrintStatus();
   }
 
   void AddPoints()
@@ -132,10 +181,12 @@ public:
   void PrintStatus()
   {
     Serial.println();
-    Serial.println((String)"Hoop " + lane + "summary:");
+    Serial.println((String)"Hoop " + lane + " summary:");
     Serial.println((String)"  playing: " + gamePlaying);
     Serial.println((String)"  time: " + secondsRemaining);
     Serial.println((String)"  score: " + points);
+    Serial.println((String)"  num score pins: " + scoreDisplay.numPins);
+    Serial.println((String)"  num timer pins: " + timerDisplay.numPins);
     Serial.println();
   }
 
@@ -157,8 +208,8 @@ public:
 };
  
  
-Hoop hoop1(1);
-Hoop hoop2(2);
+Hoop hoop1(1, 0);
+Hoop hoop2(2, 49);
 
 char serialInput;
  
@@ -167,6 +218,7 @@ void setup()
   Serial.begin(9600);
   hoop1.Setup();
   hoop2.Setup();
+  Serial.println("Ready!");
 } 
  
  
@@ -182,17 +234,23 @@ void readSerial() {
   if (Serial.available() > 0) {
       serialInput = Serial.read();
       switch ( serialInput ) {
-        case 'S':
+        case 'q':
           hoop1.StartGame();
           break;
-        case 'P':
+        case 'w':
           hoop1.AddPoints();
           break;
-        case 'A':
+        case 'e':
+          hoop1.PrintStatus();
+          break;
+        case 'a':
           hoop2.StartGame();
           break;
-        case 'O':
+        case 's':
           hoop2.AddPoints();
+          break;
+        case 'd':
+          hoop1.PrintStatus();
           break;
         default:
           Serial.print("What? Received: ");
