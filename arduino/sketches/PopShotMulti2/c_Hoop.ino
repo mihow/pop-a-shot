@@ -23,6 +23,7 @@ class Hoop
     int multiButtonLight;
 
     unsigned long lastTimerUpdate;
+    unsigned long lastGameOver;
     unsigned long lastEffectUpdate;
     int effectStep;
 
@@ -68,7 +69,13 @@ class Hoop
 
         CheckStartButton();
         CheckMultiButton();
-        UpdateEffect();
+
+        if (millis() - lastGameOver > 60000) {
+          // Start attractor effect 1 min after game ends
+          UpdateEffect();
+        } else {
+          // Flash last score
+        }
 
       }
     }
@@ -85,6 +92,7 @@ class Hoop
     void EndGame()
     {
       gamePlaying = false;
+      lastGameOver = millis();
       Serial.println((String)"Hoop " + lane + ": GAME OVER!");
     }
 
