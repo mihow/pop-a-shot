@@ -18,14 +18,14 @@
 #include "Adafruit_TLC5947.h"
 
 // How many boards do you have chained?
-#define NUM_TLC5974 6
-#define NUM_DIGITS 15
+#define NUM_TLC5974 2
+#define NUM_DIGITS 5
 
 //display 1 is 43,42,44 data,clock,latch
 //display 2 is 46,45,47 data,clock,latch
 
-#define data   46
 #define clock   45
+#define data   46
 #define latch   47
 
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(NUM_TLC5974, clock, data, latch);

@@ -1,7 +1,7 @@
 #include "Adafruit_TLC5947.h"
 
 // How many boards do you have chained?
-#define NUM_TLC5974 6
+#define NUM_TLC5974 2
 
 #define clock   45
 #define data    46
@@ -63,20 +63,20 @@ int numbers[10][7] = {
 
 
 // Hoop 4
-// int displaySet = 0; // Hoop 4 = 0, Hoop 3 = 1, Hoop 2 = 2, Hoop 1 = 3;
-// int startButtonPin = 41;//NOTE THIS IS LOW=TRUE
-// int startButtonLight = 8;
-// int multiButtonPin = 40;//NOTE THIS IS LOW=TRUE
-// int multiButtonLight = 7;
-// int sensorPin = 58; //HOOOOOOOOOOP
+ int displaySet = 0; // Hoop 4 = 0, Hoop 3 = 1, Hoop 2 = 2, Hoop 1 = 3;
+ int startButtonPin = 41;//NOTE THIS IS LOW=TRUE
+ int startButtonLight = 8;
+ int multiButtonPin = 40;//NOTE THIS IS LOW=TRUE
+ int multiButtonLight = 7;
+ int sensorPin = 58; //HOOOOOOOOOOP
 
 // Hoop 3
-int displaySet = 1;
-int startButtonPin = 38;
-int startButtonLight = 6;
-int multiButtonPin = 37;
-int multiButtonLight = 9;
-int sensorPin = 59;
+//int displaySet = 1;
+//int startButtonPin = 38;
+//int startButtonLight = 6;
+//int multiButtonPin = 37;
+//int multiButtonLight = 9;
+//int sensorPin = 59;
 
 // Hoop 2
 // int displaySet = 2;
