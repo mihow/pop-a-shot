@@ -22,22 +22,25 @@ class Hoop
     int startButtonLight;
     int multiButtonLight;
 
+    Bounce sensor;
+    Bounce startButton;
+
     unsigned long lastTimerUpdate;
     unsigned long lastGameOver;
     unsigned long lastEffectUpdate;
     int effectStep;
 
-    Hoop(int l, int fp)
+    Hoop(int l, int fdp, int sp, int sbp, int mbp, int sbl, int mbl)
     {
       lane = l;
-      firstDisplayPin = fp;
-      scoreDisplayPin = fp;
-      timerDisplayPin = fp + 24; // Offset by 3 digits.
-      // sensorPin = sp;
-      // startButtonPin = sbp;
-      // multiButtonPin = mbp;
-      // startButtonLight = sbl;
-      // multiButtonLight = mbl;
+      firstDisplayPin = fdp;
+      scoreDisplayPin = fdp;
+      timerDisplayPin = fdp + 24; // Offset by 3 digits.
+      sensorPin = sp;
+      startButtonPin = sbp;
+      multiButtonPin = mbp;
+      startButtonLight = sbl;
+      multiButtonLight = mbl;
     }
 
     void Setup()
@@ -46,11 +49,15 @@ class Hoop
 
       scoreDisplay.Setup(3, scoreDisplayPin);
       timerDisplay.Setup(2, timerDisplayPin);
-
       // scoreDisplay.ON = 100; // Lower brightness of score
-
       timerDisplay.Set(0);
       scoreDisplay.Set(0);
+
+      sensor.interval(400);
+      sensor.attach(sensorPin);
+      
+      startButton.interval(800);
+      startButton.attach(startButtonPin);
 
       PrintStatus();
 
@@ -67,8 +74,7 @@ class Hoop
 
       } else {
 
-        CheckStartButton();
-        CheckMultiButton();
+        CheckButtons();
 
         if (millis() - lastGameOver > 60000) {
           // Start attractor effect 1 min after game ends
@@ -191,18 +197,20 @@ class Hoop
 
     void CheckHoopSensor()
     {
-      if (false)
-      {
+      sensor.update();
+      sensor.read();
+      if (sensor.rose()) {
         AddPoints();
       }
     }
 
-    void CheckStartButton()
+    void CheckButtons()
     {
-    }
-
-    void CheckMultiButton()
-    {
+      startButton.update();
+      startButton.read();
+      if (startButton.rose()) {
+        StartGame();
+      }
     }
 
     void UpdateDisplay(Adafruit_TLC5947 tlc)

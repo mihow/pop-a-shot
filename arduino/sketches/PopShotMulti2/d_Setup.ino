@@ -1,7 +1,19 @@
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(2, 45, 46, 47);
 
-Hoop hoop1(1, 0);
-Hoop hoop2(2, 49);
+//Hoop hoop1(1, 99, 99, 99, 99, 99, 99);
+Hoop hoop2(2, 99, 99, 99, 99, 99, 99);
+//Hoop hoop3(3, 99, 99, 99, 99, 99, 99);
+//Hoop hoop4(3, 99, 99, 99, 99, 99, 99);
+
+Hoop hoop1(
+  4, // Lane number
+  0, // First display pin
+  58, // Sensor pin
+  41, // Start button pin
+  40, // Multi button pin
+  8, // Start button light
+  6 // Multi button light
+);
 
 char serialInput;
 unsigned long lastDisplayUpdate;
