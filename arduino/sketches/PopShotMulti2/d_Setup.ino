@@ -42,27 +42,32 @@ Hoop hoop4(
 );
 
 int numHoops = 2;
-Hoop* hoops[] = {&hoop2, &hoop3};
+Hoop* hoops[] = {&hoop1, &hoop3};
 
 int debugHoop = 0;
 char serialInput;
 unsigned long lastDisplayUpdate;
 int refreshRate = 20;
+bool gamesPaused = false;
+
 
 void setup()
 {
   Serial.begin(9600);
   Serial.println("Setting up...");
-  
+
   //hoop1.Setup();
 
-  for (int i=0; i<numHoops; i++) {
+  for (int i = 0; i < numHoops; i++) {
     // Setup all configured hoops
     hoops[i]->Setup();
   }
 
   tlc.begin();
   Serial.println("Ready!");
+
+//  pinMode(44, OUTPUT);
+//  digitalWrite(44, HIGH);
 
 }
 
@@ -81,7 +86,7 @@ void writeDisplay()
 void readSerial() {
   if (Serial.available() > 0) {
     serialInput = Serial.read();
-    
+
     switch ( serialInput ) {
       case '1':
         debugHoop = 0;
@@ -109,8 +114,13 @@ void readSerial() {
       case 'e':
         hoops[debugHoop]->PrintStatus();
         break;
+
       case 'X':
         writeDisplay();
+        break;
+      case 'P':
+        gamesPaused = !gamesPaused;
+        Serial.println((String)"Pause: " + gamesPaused);
         break;
 
       default:
