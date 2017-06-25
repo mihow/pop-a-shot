@@ -8,7 +8,7 @@ Hoop hoop2(2, 99, 99, 99, 99, 99, 99);
 Hoop hoop1(
   4, // Lane number
   0, // First display pin
-  58, // Sensor pin
+  51, // Sensor pin
   41, // Start button pin
   40, // Multi button pin
   8, // Start button light

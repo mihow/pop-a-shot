@@ -1,15 +1,5 @@
 class SevenSeg
 {
-    // Set segment pins
-    int _A = 6;
-    int _B = 7;
-    int _C = 2;
-    int _D = 1;
-    int _E = 0;
-    int _F = 5;
-    int _G = 4;
-    int _DP = -1; // DP initially not assigned
-
     unsigned long previousMillis;
 
   public:
@@ -19,6 +9,16 @@ class SevenSeg
 
     int ON = 4095; // Max value for TLC driver
     int OFF = 0;
+
+    // Set segment pins
+    int _A = 6;
+    int _B = 7;
+    int _C = 2;
+    int _D = 1;
+    int _E = 0;
+    int _F = 5;
+    int _G = 4;
+    int _DP = -1; // DP initially not assigned
 
     int numPins;
     int *pins;

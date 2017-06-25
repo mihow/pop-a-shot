@@ -53,11 +53,15 @@ class Hoop
       timerDisplay.Set(0);
       scoreDisplay.Set(0);
 
-      sensor.interval(400);
+      pinMode(sensorPin, INPUT);
       sensor.attach(sensorPin);
-      
-      startButton.interval(800);
+      sensor.interval(20);
+
+      pinMode(startButtonPin, INPUT);
       startButton.attach(startButtonPin);
+      startButton.interval(1000);
+
+      pinMode(13, OUTPUT);
 
       PrintStatus();
 
@@ -76,7 +80,7 @@ class Hoop
 
         CheckButtons();
 
-        if (millis() - lastGameOver > 60000) {
+        if (millis() - lastGameOver > 1000) {
           // Start attractor effect 1 min after game ends
           UpdateEffect();
         } else {
@@ -128,24 +132,6 @@ class Hoop
         EndGame();
       }
     }
-
-    //    void UpdateEffect()
-    //    {
-    //      if ((millis() - lastEffectUpdate) > 1000)
-    //      {
-    //        if (effectStep == 0)
-    //        {
-    //          timerDisplay.Set(77);
-    //          scoreDisplay.SetAllSegs(0);
-    //          effectStep = 1;
-    //        } else {
-    //          timerDisplay.SetAllSegs(0);
-    //          scoreDisplay.Set(777);
-    //          effectState = 0;
-    //        }
-    //        lastEffectUpdate = millis();
-    //      }
-    //    }
 
     void UpdateEffect()
     {
@@ -207,7 +193,8 @@ class Hoop
     void CheckButtons()
     {
       startButton.update();
-      startButton.read();
+      int val = startButton.read();
+      digitalWrite(13, val);
       if (startButton.rose()) {
         StartGame();
       }
