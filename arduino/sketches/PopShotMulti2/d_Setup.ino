@@ -2,17 +2,17 @@ Adafruit_TLC5947 tlc = Adafruit_TLC5947(2, 45, 46, 47);
 
 
 Hoop hoop1(
-  4, // Lane number
+  1, // Lane number
   0, // First display pin
   51, // Sensor pin (CHANGE TO 58)
   41, // Start button pin
   40, // Multi button pin
-  8, // Start button light
+  13, // Start button light (CHANGE TO 8)
   7 // Multi button light
 );
 
-Hoop hoop3(
-  3, // Lane number
+Hoop hoop2(
+  2, // Lane number
   49, // First display pin
   59, // Sensor pin
   38, // Start button pin
@@ -21,15 +21,8 @@ Hoop hoop3(
   9 // Multi button light
 );
 
-Hoop hoop2(
-  2, // Lane number
-  73, // First display pin
-  57, // Sensor pin
-  999, // Start button pin
-  999, // Multi button pin
-  999, // Start button light
-  999 // Multi button light
-);
+Hoop* hoops[2] = {&hoop1, &hoop2};
+int debugHoop = 0;
 
 char serialInput;
 unsigned long lastDisplayUpdate;
@@ -42,6 +35,7 @@ void setup()
   hoop2.Setup();
   tlc.begin();
   Serial.println("Ready!");
+
 }
 
 void writeDisplay()
@@ -59,26 +53,25 @@ void writeDisplay()
 void readSerial() {
   if (Serial.available() > 0) {
     serialInput = Serial.read();
+    
     switch ( serialInput ) {
+      case '1':
+        debugHoop = 0;
+        Serial.println("CONTROLLING HOOP 1");
+        break;
+      case '2':
+        debugHoop = 1;
+        Serial.println("CONTROLLING HOOP 2");
+        break;
 
       case 'q':
-        hoop1.StartGame();
+        hoops[debugHoop]->StartGame();
         break;
       case 'w':
-        hoop1.AddPoints();
+        hoops[debugHoop]->AddPoints();
         break;
       case 'e':
-        hoop1.PrintStatus();
-        break;
-
-      case 'a':
-        hoop2.StartGame();
-        break;
-      case 's':
-        hoop2.AddPoints();
-        break;
-      case 'd':
-        hoop2.PrintStatus();
+        hoops[debugHoop]->PrintStatus();
         break;
 
       default:

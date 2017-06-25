@@ -15,6 +15,7 @@ class Hoop
     int points;
     int secondsRemaining;
     int gameLength = 45;
+    int effectStep;
 
     int sensorPin;
     int startButtonPin;
@@ -22,13 +23,19 @@ class Hoop
     int startButtonLight;
     int multiButtonLight;
 
-    Bounce sensor;
     Bounce startButton;
+    int sensor;
+    int lastSensorState;
 
+    unsigned long currTime;
     unsigned long lastTimerUpdate;
     unsigned long lastGameOver;
     unsigned long lastEffectUpdate;
-    int effectStep;
+    unsigned long shotStartTime;
+    unsigned long lastScoreTime;
+    unsigned long sensorOnTime;
+    unsigned long lastStartButtonTime;
+
 
     Hoop(int l, int fdp, int sp, int sbp, int mbp, int sbl, int mbl)
     {
@@ -45,21 +52,22 @@ class Hoop
 
     void Setup()
     {
-      pinMode(13, OUTPUT);
 
       scoreDisplay.Setup(3, scoreDisplayPin);
       timerDisplay.Setup(2, timerDisplayPin);
-      // scoreDisplay.ON = 100; // Lower brightness of score
+
+      scoreDisplay.ON = 1024; // Lower brightness of score
+      
       timerDisplay.Set(0);
       scoreDisplay.Set(0);
 
       pinMode(sensorPin, INPUT);
-      sensor.attach(sensorPin);
-      sensor.interval(20);
+      //sensor.attach(sensorPin);
+      //sensor.interval(8);
 
       pinMode(startButtonPin, INPUT);
       startButton.attach(startButtonPin);
-      startButton.interval(1000);
+      startButton.interval(5);
 
       pinMode(13, OUTPUT);
 
@@ -71,6 +79,8 @@ class Hoop
 
     void Update()
     {
+      currTime = millis();
+      
       if (gamePlaying) {
 
         UpdateTimer();
@@ -183,18 +193,42 @@ class Hoop
 
     void CheckHoopSensor()
     {
-      sensor.update();
-      sensor.read();
-      if (sensor.rose()) {
-        AddPoints();
+      sensor = digitalRead(sensorPin);
+            
+//      if (sensorChanged) {
+//        Serial.println((String)"Hoop " + lane + " sensor state changed");
+//      }
+
+      if (sensor == LOW && lastSensorState == HIGH) {
+        shotStartTime = currTime;
+        lastSensorState = LOW;
       }
+
+      if (sensor == HIGH && lastSensorState == LOW) {
+        sensorOnTime = currTime - shotStartTime;
+        Serial.println((String)"Hoop " + lane + " sensor on time: " + sensorOnTime);
+
+        if (sensorOnTime > 24 && sensorOnTime < 300) {
+          // Looks like a basketball passing through, not net.
+          
+          if (currTime - lastScoreTime > 400) {
+            // Maximum realistic time between shots
+            
+            AddPoints();
+            
+            lastScoreTime = currTime;
+          }
+        }
+      }
+      lastSensorState = sensor;
     }
 
     void CheckButtons()
     {
       startButton.update();
-      int val = startButton.read();
-      digitalWrite(13, val);
+      int state = startButton.read();
+      digitalWrite(startButtonLight, state);
+      
       if (startButton.rose()) {
         StartGame();
       }
