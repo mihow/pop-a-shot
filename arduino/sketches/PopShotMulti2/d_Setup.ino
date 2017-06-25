@@ -1,18 +1,34 @@
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(2, 45, 46, 47);
 
-//Hoop hoop1(1, 99, 99, 99, 99, 99, 99);
-Hoop hoop2(2, 99, 99, 99, 99, 99, 99);
-//Hoop hoop3(3, 99, 99, 99, 99, 99, 99);
-//Hoop hoop4(3, 99, 99, 99, 99, 99, 99);
 
 Hoop hoop1(
   4, // Lane number
   0, // First display pin
-  51, // Sensor pin
+  51, // Sensor pin (CHANGE TO 58)
   41, // Start button pin
   40, // Multi button pin
   8, // Start button light
-  6 // Multi button light
+  7 // Multi button light
+);
+
+Hoop hoop3(
+  3, // Lane number
+  49, // First display pin
+  59, // Sensor pin
+  38, // Start button pin
+  37, // Multi button pin
+  6, // Start button light
+  9 // Multi button light
+);
+
+Hoop hoop2(
+  2, // Lane number
+  73, // First display pin
+  57, // Sensor pin
+  999, // Start button pin
+  999, // Multi button pin
+  999, // Start button light
+  999 // Multi button light
 );
 
 char serialInput;
