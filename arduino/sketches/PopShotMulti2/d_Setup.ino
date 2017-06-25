@@ -25,15 +25,26 @@ Hoop hoop3(
   3, // Lane number
   96, // First display pin
   57, // Sensor pin
-  32, // Start button pin
-  31, // Multi button pin
+  31, // Start button pin
+  32, // Multi button pin
   4, // Start button light
   3 // Multi button light
 );
 
-Hoop* hoops[] = {&hoop1, &hoop2, &hoop3};
-int debugHoop = 0;
+Hoop hoop4(
+  4, // Lane number
+  144, // First display pin
+  56, // Sensor pin // @TODO Wrong pin
+  35, // Start button pin // @TODO no light
+  34, // Multi button pin
+  1, // Start button light
+  2 // Multi button light
+);
 
+int numHoops = 2;
+Hoop* hoops[] = {&hoop2, &hoop3};
+
+int debugHoop = 0;
 char serialInput;
 unsigned long lastDisplayUpdate;
 int refreshRate = 20;
@@ -42,8 +53,14 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("Setting up...");
-  hoop1.Setup();
-  hoop2.Setup();
+  
+  //hoop1.Setup();
+
+  for (int i=0; i<numHoops; i++) {
+    // Setup all configured hoops
+    hoops[i]->Setup();
+  }
+
   tlc.begin();
   Serial.println("Ready!");
 
@@ -68,11 +85,19 @@ void readSerial() {
     switch ( serialInput ) {
       case '1':
         debugHoop = 0;
-        Serial.println("CONTROLLING HOOP 1");
+        Serial.println((String)"CONTROLLING HOOP " + hoops[debugHoop]->lane);
         break;
       case '2':
         debugHoop = 1;
-        Serial.println("CONTROLLING HOOP 2");
+        Serial.println((String)"CONTROLLING HOOP " + hoops[debugHoop]->lane);
+        break;
+      case '3':
+        debugHoop = 2;
+        Serial.println((String)"CONTROLLING HOOP " + hoops[debugHoop]->lane);
+        break;
+      case '4':
+        debugHoop = 3;
+        Serial.println((String)"CONTROLLING HOOP " + hoops[debugHoop]->lane);
         break;
 
       case 'q':
@@ -83,6 +108,9 @@ void readSerial() {
         break;
       case 'e':
         hoops[debugHoop]->PrintStatus();
+        break;
+      case 'X':
+        writeDisplay();
         break;
 
       default:

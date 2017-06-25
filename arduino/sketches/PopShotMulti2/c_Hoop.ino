@@ -58,14 +58,12 @@ class Hoop
       scoreDisplay.Setup(3, scoreDisplayPin);
       timerDisplay.Setup(2, timerDisplayPin);
 
-      scoreDisplay.ON = 4095; // Lower brightness of score
+      scoreDisplay.ON = 4095; // Lower brightness of score here
 
       timerDisplay.Set(0);
       scoreDisplay.Set(0);
 
       pinMode(sensorPin, INPUT);
-      //sensor.attach(sensorPin);
-      //sensor.interval(8);
 
       pinMode(startButtonPin, INPUT_PULLUP);
       startButton.attach(startButtonPin);
@@ -205,10 +203,6 @@ class Hoop
     void CheckHoopSensor()
     {
       sensor = digitalRead(sensorPin);
-
-      //      if (sensorChanged) {
-      //        Serial.println((String)"Hoop " + lane + " sensor state changed");
-      //      }
 
       if (sensor == LOW && lastSensorState == HIGH) {
         shotStartTime = currTime;
