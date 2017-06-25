@@ -7,6 +7,9 @@ void loop()
   
   hoop2.Update();
   hoop2.UpdateDisplay(tlc);
+
+  hoop3.Update();
+  hoop3.UpdateDisplay(tlc);
   
   writeDisplay();
 }

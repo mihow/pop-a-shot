@@ -1,19 +1,19 @@
-Adafruit_TLC5947 tlc = Adafruit_TLC5947(2, 45, 46, 47);
+Adafruit_TLC5947 tlc = Adafruit_TLC5947(8, 45, 46, 47);
 
 
 Hoop hoop1(
   1, // Lane number
   0, // First display pin
-  51, // Sensor pin (CHANGE TO 58)
+  58, // Sensor pin
   41, // Start button pin
   40, // Multi button pin
-  13, // Start button light (CHANGE TO 8)
-  7 // Multi button light
+  7, // Start button light
+  8 // Multi button light
 );
 
 Hoop hoop2(
   2, // Lane number
-  49, // First display pin
+  48, // First display pin
   59, // Sensor pin
   38, // Start button pin
   37, // Multi button pin
@@ -21,11 +21,22 @@ Hoop hoop2(
   9 // Multi button light
 );
 
-Hoop* hoops[2] = {&hoop1, &hoop2};
+Hoop hoop3(
+  3, // Lane number
+  96, // First display pin
+  57, // Sensor pin
+  32, // Start button pin
+  31, // Multi button pin
+  4, // Start button light
+  3 // Multi button light
+);
+
+Hoop* hoops[] = {&hoop1, &hoop2, &hoop3};
 int debugHoop = 0;
 
 char serialInput;
 unsigned long lastDisplayUpdate;
+int refreshRate = 20;
 
 void setup()
 {
@@ -42,7 +53,7 @@ void writeDisplay()
 {
   unsigned long timeNow = millis();
 
-  if (timeNow - lastDisplayUpdate > 20)
+  if (timeNow - lastDisplayUpdate > refreshRate)
   {
     // if buffer has changed?
     tlc.write();

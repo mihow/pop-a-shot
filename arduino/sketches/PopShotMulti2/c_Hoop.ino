@@ -24,6 +24,8 @@ class Hoop
     int multiButtonLight;
 
     Bounce startButton;
+    Bounce multiButton;
+
     int sensor;
     int lastSensorState;
 
@@ -56,8 +58,8 @@ class Hoop
       scoreDisplay.Setup(3, scoreDisplayPin);
       timerDisplay.Setup(2, timerDisplayPin);
 
-      scoreDisplay.ON = 1024; // Lower brightness of score
-      
+      scoreDisplay.ON = 4095; // Lower brightness of score
+
       timerDisplay.Set(0);
       scoreDisplay.Set(0);
 
@@ -65,9 +67,18 @@ class Hoop
       //sensor.attach(sensorPin);
       //sensor.interval(8);
 
-      pinMode(startButtonPin, INPUT);
+      pinMode(startButtonPin, INPUT_PULLUP);
       startButton.attach(startButtonPin);
       startButton.interval(5);
+
+      pinMode(multiButtonPin, INPUT_PULLUP);
+      multiButton.attach(multiButtonPin);
+      multiButton.interval(5);
+
+      pinMode(startButtonLight, OUTPUT);
+      pinMode(multiButtonLight, OUTPUT);
+      digitalWrite(startButtonLight, HIGH);
+      digitalWrite(multiButtonLight, HIGH);
 
       pinMode(13, OUTPUT);
 
@@ -80,19 +91,20 @@ class Hoop
     void Update()
     {
       currTime = millis();
-      
+
       if (gamePlaying) {
 
         UpdateTimer();
         CheckHoopSensor();
+        CheckButtons(); // @TODO only check when game isn't running?
 
       } else {
 
         CheckButtons();
 
-        if (millis() - lastGameOver > 1000) {
+        if (millis() - lastGameOver > 30000) {
           // Start attractor effect 1 min after game ends
-          UpdateEffect();
+          //UpdateEffect();
         } else {
           // Flash last score
         }
@@ -155,11 +167,10 @@ class Hoop
         // int digit = effectStep % disp.numDigits;
         int i = effectStep % disp.numPins;
         disp.pins[i] = disp.ON / 100;
-        disp.pins[(i+1) % disp.numPins] = disp.ON / 10;
-        disp.pins[(i+2) % disp.numPins] = disp.ON;
-        disp.pins[(i+3) % disp.numPins] = disp.ON;
-        disp.pins[(i+4) % disp.numPins] = disp.ON;
-        disp.pins[(i+5) % disp.numPins] = disp.ON;
+        disp.pins[(i + 1) % disp.numPins] = disp.ON / 10;
+        disp.pins[(i + 2) % disp.numPins] = disp.ON;
+        disp.pins[(i + 3) % disp.numPins] = disp.ON;
+        disp.pins[(i + 4) % disp.numPins] = disp.ON;
 
         // Flash 77 on Timer
         if ((effectStep % 10) > 5) {
@@ -194,10 +205,10 @@ class Hoop
     void CheckHoopSensor()
     {
       sensor = digitalRead(sensorPin);
-            
-//      if (sensorChanged) {
-//        Serial.println((String)"Hoop " + lane + " sensor state changed");
-//      }
+
+      //      if (sensorChanged) {
+      //        Serial.println((String)"Hoop " + lane + " sensor state changed");
+      //      }
 
       if (sensor == LOW && lastSensorState == HIGH) {
         shotStartTime = currTime;
@@ -210,12 +221,12 @@ class Hoop
 
         if (sensorOnTime > 24 && sensorOnTime < 300) {
           // Looks like a basketball passing through, not net.
-          
+
           if (currTime - lastScoreTime > 400) {
             // Maximum realistic time between shots
-            
+
             AddPoints();
-            
+
             lastScoreTime = currTime;
           }
         }
@@ -226,10 +237,15 @@ class Hoop
     void CheckButtons()
     {
       startButton.update();
-      int state = startButton.read();
-      digitalWrite(startButtonLight, state);
-      
-      if (startButton.rose()) {
+      multiButton.update();
+
+      int startButtonState = startButton.read();
+      int multiButtonState = multiButton.read();
+
+      digitalWrite(startButtonLight, startButtonState);
+      digitalWrite(multiButtonLight, multiButtonState);
+
+      if (startButton.fell()) {
         StartGame();
       }
     }
