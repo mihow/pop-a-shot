@@ -1,25 +1,25 @@
-/*************************************************** 
+/***************************************************
   This is an example for our Adafruit 24-channel PWM/LED driver
 
   Pick one up today in the adafruit shop!
   ------> http://www.adafruit.com/products/1429
 
-  These drivers uses SPI to communicate, 3 pins are required to  
+  These drivers uses SPI to communicate, 3 pins are required to
   interface: Data, Clock and Latch. The boards are chainable
 
-  Adafruit invests time and resources providing this open source code, 
-  please support Adafruit and open-source hardware by purchasing 
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
   products from Adafruit!
 
-  Written by Limor Fried/Ladyada for Adafruit Industries.  
+  Written by Limor Fried/Ladyada for Adafruit Industries.
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
 #include "Adafruit_TLC5947.h"
 
 // How many boards do you have chained?
-#define NUM_TLC5974 2
-#define NUM_DIGITS 5
+#define NUM_TLC5974 8
+#define NUM_DIGITS 25
 
 //display 1 is 43,42,44 data,clock,latch
 //display 2 is 46,45,47 data,clock,latch
@@ -32,24 +32,27 @@ Adafruit_TLC5947 tlc = Adafruit_TLC5947(NUM_TLC5974, clock, data, latch);
 
 void setup() {
   Serial.begin(9600);
-  
+
   Serial.println("TLC5974 test");
   tlc.begin();
 }
 
 void loop() {
-  cycle(100, 4095);
+  cycle(10, 4095);
   delay(500);
-  
+
   setAll(0);
   delay(500);
-  
-  //fadeIn(50);
-  //delay(500);
-  
+
+  setSomeCycle(1000, 4095);
+  delay(500);
+
+  //  fadeIn(50);
+  //  delay(500);
+
   setAll(0);
   delay(500);
-  
+
   blink(500);
   blink(500);
   delay(500);
@@ -66,28 +69,47 @@ void blink(int wait) {
 }
 
 void fadeIn(int interval) {
-  for(int i=0; i<4095; i=i+interval) {
+  for (int i = 0; i < 4095; i = i + interval) {
     setAll(i);
   }
 }
 
 void setAll(int brightness) {
-  for(uint16_t i=0; i<8*NUM_DIGITS; i++) {
+  for (uint16_t i = 0; i < 8 * NUM_DIGITS; i++) {
+    tlc.setPWM(i, brightness);
+  }
+  delay(2);
+  tlc.write();
+}
+
+void setSome(int modu, int brightness) {
+  for (uint16_t i = 0; i < 8 * NUM_DIGITS; i++) {
+    if (i % modu == 0) {
       tlc.setPWM(i, brightness);
+    } else {
+      tlc.setPWM(i, 0);
+    }
   }
   tlc.write();
 }
 
-void cycle(int wait, int brightness) {
-  for(uint16_t i=0; i<8*NUM_DIGITS; i++) {
-      tlc.setPWM(i, brightness);
-      tlc.write();
-      delay(wait);
+void setSomeCycle(int wait, int brightness) {
+  for (int i = 20; i > 0; i--) {
+    setSome(i, brightness);
+    delay(wait);
   }
-  for(uint16_t i=8*NUM_DIGITS; i<0; i--) {
-      tlc.setPWM(i, 0);
-      tlc.write();
-      delay(wait);
+}
+
+void cycle(int wait, int brightness) {
+  for (uint16_t i = 0; i < 8 * NUM_DIGITS; i++) {
+    tlc.setPWM(i, brightness);
+    tlc.write();
+    delay(wait);
+  }
+  for (uint16_t i = 8 * NUM_DIGITS; i < 0; i--) {
+    tlc.setPWM(i, 0);
+    tlc.write();
+    delay(wait);
   }
 }
 
