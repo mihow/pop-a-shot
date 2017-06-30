@@ -37,6 +37,8 @@ class Hoop
     unsigned long lastScoreTime;
     unsigned long sensorOnTime;
     unsigned long lastStartButtonTime;
+    unsigned long lastTimerFlashTime;
+    bool lastTimerFlashState;
 
 
     Hoop(int l, int fdp, int sp, int sbp, int mbp, int sbl, int mbl)
@@ -100,11 +102,14 @@ class Hoop
 
         CheckButtons();
 
-        if (millis() - lastGameOver > 30000) {
+        if (currTime - lastGameOver > 30000) {
           // Start attractor effect 1 min after game ends
-          //UpdateEffect();
+          UpdateEffect();
+        } else if (currTime - lastGameOver < 5000) {
+          // Flash the timer for 10 seconds after game ends
+          FlashTimer();
         } else {
-          // Flash last score
+          // Keep last score up
         }
 
       }
@@ -113,9 +118,15 @@ class Hoop
     void StartGame()
     {
       gamePlaying = true;
-      points = 0;
+      
       secondsRemaining = gameLength;
+      timerDisplay.Set(55);
+      //lastTimerUpdate = millis();
+      
+      points = 0;
       scoreDisplay.Set(points);
+      lastScoreTime = 0;
+      
       Serial.println((String)"Hoop " + lane + ": GAME STARTED!");
     }
 
@@ -140,16 +151,22 @@ class Hoop
 
     void UpdateTimer()
     {
+        
       if ((millis() - lastTimerUpdate) > 1000)
       {
-        secondsRemaining -= 1;
-        lastTimerUpdate = millis();
         timerDisplay.Set(secondsRemaining);
+        
+        // Give the player a whole second at zero
+        if (secondsRemaining <= 0)
+        {
+          EndGame();
+        } else {
+          secondsRemaining -= 1;
+        }
+
+        lastTimerUpdate = millis();
+
         Serial.println((String)"Hoop " + lane + " time: " + secondsRemaining);
-      }
-      if (secondsRemaining <= 0)
-      {
-        EndGame();
       }
     }
 
@@ -164,18 +181,24 @@ class Hoop
         // int seg = effectStep % disp.numSegments;
         // int digit = effectStep % disp.numDigits;
         int i = effectStep % disp.numPins;
-        disp.pins[i] = disp.ON / 100;
-        disp.pins[(i + 1) % disp.numPins] = disp.ON / 10;
+        disp.pins[i] = disp.ON; // / 100;
+        disp.pins[(i + 1) % disp.numPins] = disp.ON; // / 10;
         disp.pins[(i + 2) % disp.numPins] = disp.ON;
         disp.pins[(i + 3) % disp.numPins] = disp.ON;
         disp.pins[(i + 4) % disp.numPins] = disp.ON;
+        disp.pins[(i + 5) % disp.numPins] = disp.ON;
+        disp.pins[(i + 6) % disp.numPins] = disp.ON;
+        disp.pins[(i + 7) % disp.numPins] = disp.ON;
+        disp.pins[(i + 8) % disp.numPins] = disp.ON;
+        disp.pins[(i + 9) % disp.numPins] = disp.ON;
 
-        // Flash 77 on Timer
-        if ((effectStep % 10) > 5) {
-          timerDisplay.SetAllSegs(0);
-        } else {
-          timerDisplay.Set(77);
-        }
+        timerDisplay.Set(0);
+//        // Flash 77 on Timer
+//        if ((effectStep % 10) > 5) {
+//          timerDisplay.SetAllSegs(0);
+//        } else {
+//          timerDisplay.Set(77);
+//        }
 
         effectStep++;
 
@@ -216,7 +239,7 @@ class Hoop
         if (sensorOnTime > 24 && sensorOnTime < 300) {
           // Looks like a basketball passing through, not net.
 
-          if (currTime - lastScoreTime > 400) {
+          if (currTime - lastScoreTime > 500) {
             // Maximum realistic time between shots
 
             AddPoints();
@@ -241,6 +264,18 @@ class Hoop
 
       if (startButton.fell()) {
         StartGame();
+      }
+    }
+
+    void FlashTimer() {
+      if (currTime - lastTimerFlashTime > 500) {
+        if (lastTimerFlashState == true) {
+          timerDisplay.Set(0);
+        } else {
+          timerDisplay.AllSegs(0);
+        }
+        lastTimerFlashTime = currTime;
+        lastTimerFlashState = !lastTimerFlashState;
       }
     }
 

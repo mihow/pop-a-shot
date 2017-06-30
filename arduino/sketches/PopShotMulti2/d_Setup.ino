@@ -1,4 +1,4 @@
-Adafruit_TLC5947 tlc = Adafruit_TLC5947(8, 45, 46, 47);
+Adafruit_TLC5947 tlc = Adafruit_TLC5947(8, 45, 46, 47, 42);
 
 
 Hoop hoop1(
