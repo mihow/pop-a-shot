@@ -42,14 +42,25 @@ Hoop hoop4(
 );
 
 int numHoops = 2;
-Hoop* hoops[] = {&hoop1, &hoop3};
+Hoop* hoops[] = {&hoop1, &hoop2};//, &hoop3, &hoop4};
 
 int debugHoop = 0;
 char serialInput;
 unsigned long lastDisplayUpdate;
 int refreshRate = 20;
 bool gamesPaused = false;
+byte oePin = 42;
 
+
+void blinkOE() {
+  int wait = 500;
+  for (int i=0; i<5; i++) {
+    digitalWrite(oePin, HIGH);
+    delay(wait);
+    digitalWrite(oePin, LOW);
+    delay(wait);
+  }
+}
 
 void setup()
 {
@@ -66,9 +77,8 @@ void setup()
   tlc.begin();
   Serial.println("Ready!");
 
-//  pinMode(44, OUTPUT);
-//  digitalWrite(44, HIGH);
-
+  pinMode(oePin, OUTPUT);
+  blinkOE();
 }
 
 void writeDisplay()
@@ -130,3 +140,4 @@ void readSerial() {
     }
   }
 }
+
