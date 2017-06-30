@@ -1,6 +1,17 @@
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(8, 45, 46, 47, 42);
 
 
+// Temporary hoop
+Hoop hoop99(
+  3, // Lane number
+  0, // First display pin
+  59, // Sensor pin
+  38, // Start button pin
+  37, // Multi button pin
+  6, // Start button light
+  9 // Multi button light
+);
+
 Hoop hoop1(
   1, // Lane number
   0, // First display pin
@@ -41,8 +52,8 @@ Hoop hoop4(
   2 // Multi button light
 );
 
-int numHoops = 2;
-Hoop* hoops[] = {&hoop1, &hoop2};//, &hoop3, &hoop4};
+int numHoops = 1;
+Hoop* hoops[] = {&hoop99};//, &hoop3, &hoop4};
 
 int debugHoop = 0;
 char serialInput;
@@ -53,8 +64,8 @@ byte oePin = 42;
 
 
 void blinkOE() {
-  int wait = 500;
-  for (int i=0; i<5; i++) {
+  int wait = 400;
+  for (int i=0; i<3; i++) {
     digitalWrite(oePin, HIGH);
     delay(wait);
     digitalWrite(oePin, LOW);

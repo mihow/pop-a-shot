@@ -60,7 +60,7 @@ class Hoop
       scoreDisplay.Setup(3, scoreDisplayPin);
       timerDisplay.Setup(2, timerDisplayPin);
 
-      scoreDisplay.ON = 4095; // Lower brightness of score here
+      scoreDisplay.ON = 1800; // Lower brightness of score here
 
       timerDisplay.Set(0);
       scoreDisplay.Set(0);
@@ -102,7 +102,7 @@ class Hoop
 
         CheckButtons();
 
-        if (currTime - lastGameOver > 30000) {
+        if (currTime - lastGameOver > 60000) {
           // Start attractor effect 1 min after game ends
           UpdateEffect();
         } else if (currTime - lastGameOver < 5000) {
@@ -181,8 +181,8 @@ class Hoop
         // int seg = effectStep % disp.numSegments;
         // int digit = effectStep % disp.numDigits;
         int i = effectStep % disp.numPins;
-        disp.pins[i] = disp.ON; // / 100;
-        disp.pins[(i + 1) % disp.numPins] = disp.ON; // / 10;
+        disp.pins[i] = disp.ON / 100;
+        disp.pins[(i + 1) % disp.numPins] = disp.ON / 10;
         disp.pins[(i + 2) % disp.numPins] = disp.ON;
         disp.pins[(i + 3) % disp.numPins] = disp.ON;
         disp.pins[(i + 4) % disp.numPins] = disp.ON;
@@ -269,10 +269,10 @@ class Hoop
 
     void FlashTimer() {
       if (currTime - lastTimerFlashTime > 500) {
-        if (lastTimerFlashState == true) {
+        if (lastTimerFlashState == false) {
           timerDisplay.Set(0);
         } else {
-          timerDisplay.AllSegs(0);
+          timerDisplay.SetAllSegs(0);
         }
         lastTimerFlashTime = currTime;
         lastTimerFlashState = !lastTimerFlashState;
