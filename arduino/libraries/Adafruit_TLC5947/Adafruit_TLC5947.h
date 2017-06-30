@@ -23,7 +23,7 @@
 
 class Adafruit_TLC5947 {
  public:
-  Adafruit_TLC5947(uint16_t n, uint8_t c, uint8_t d, uint8_t l);
+  Adafruit_TLC5947(uint16_t n, uint8_t c, uint8_t d, uint8_t l, uint8_t o);
 
   boolean begin(void);
 
@@ -37,7 +37,7 @@ class Adafruit_TLC5947 {
   uint16_t *pwmbuffer;
 
   uint16_t numdrivers;
-  uint8_t _clk, _dat, _lat;
+  uint8_t _clk, _dat, _lat, _oe;
 
 };
 

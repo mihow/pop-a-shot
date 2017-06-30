@@ -18,11 +18,12 @@
 
 #include <Adafruit_TLC5947.h>
 
-Adafruit_TLC5947::Adafruit_TLC5947(uint16_t n, uint8_t c, uint8_t d, uint8_t l) {
+Adafruit_TLC5947::Adafruit_TLC5947(uint16_t n, uint8_t c, uint8_t d, uint8_t l, uint8_t o) {
   numdrivers = n;
   _clk = c;
   _dat = d;
   _lat = l;
+  _oe  = o;
 
   //pwmbuffer = (uint16_t *)calloc(2, 24*n);
   pwmbuffer = (uint16_t *)malloc(2 * 24*n);
@@ -30,28 +31,29 @@ Adafruit_TLC5947::Adafruit_TLC5947(uint16_t n, uint8_t c, uint8_t d, uint8_t l) 
 }
 
 void Adafruit_TLC5947::writeFast(void) {
-      PORTG &= ~_BV(PG5);
-  // 24 channels per TLC5974
-  for (int8_t c=24*numdrivers - 1; c >= 0 ; c--) {
-    // 12 bits per channel, send MSB first
-    for (int8_t b=11; b>=0; b--) {
-      PORTE &= ~_BV(PE3);
-      
-      if (pwmbuffer[c] & (1 << b))  
-      PORTH |= _BV(PH3);
-      else
-      PORTH &= ~_BV(PH3);
-
-      PORTE |= _BV(PE3);
-    }
-  }
-   PORTE &= ~_BV(PE3);
-   PORTG |= _BV(PG5);
-   PORTG &= ~_BV(PG5);
+//  PORTG &= ~_BV(PG5);
+//  // 24 channels per TLC5974
+//  for (int8_t c=24*numdrivers - 1; c >= 0 ; c--) {
+//    // 12 bits per channel, send MSB first
+//    for (int8_t b=11; b>=0; b--) {
+//      PORTE &= ~_BV(PE3);
+//      
+//      if (pwmbuffer[c] & (1 << b))  
+//      PORTH |= _BV(PH3);
+//      else
+//      PORTH &= ~_BV(PH3);
+//
+//      PORTE |= _BV(PE3);
+//    }
+//  }
+//   PORTE &= ~_BV(PE3);
+//   PORTG |= _BV(PG5);
+//   PORTG &= ~_BV(PG5);
 }
 
 void Adafruit_TLC5947::write(void) {
   digitalWrite(_lat, LOW);
+  digitalWrite(_oe, LOW);
   // 24 channels per TLC5974
   for (int16_t c=24*numdrivers - 1; c >= 0 ; c--) {
     // 12 bits per channel, send MSB first
@@ -69,7 +71,10 @@ void Adafruit_TLC5947::write(void) {
   digitalWrite(_clk, LOW);
   
   digitalWrite(_lat, HIGH);  
+  digitalWrite(_oe, HIGH);
+
   digitalWrite(_lat, LOW);
+  digitalWrite(_oe, LOW);
 }
 
 
@@ -94,7 +99,9 @@ boolean Adafruit_TLC5947::begin() {
   pinMode(_clk, OUTPUT);
   pinMode(_dat, OUTPUT);
   pinMode(_lat, OUTPUT);
+  pinMode(_oe, OUTPUT);
   digitalWrite(_lat, LOW);
+  digitalWrite(_oe, LOW);
 
   return true;
 }
