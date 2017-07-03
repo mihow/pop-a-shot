@@ -25,9 +25,9 @@ Hoop hoop1(
 
 Hoop hoop2(
   2, // Lane number
-  40, // Clock
-  41, // Data
-  42, // Latch
+  30, // Clock
+  31, // Data
+  32, // Latch
   59, // Sensor pin
   38, // Start button pin
   37, // Multi button pin
@@ -59,8 +59,8 @@ Hoop hoop4(
   2 // Multi button light
 );
 
-int numHoops = 1;
-Hoop* hoops[] = {&hoop1};//, &hoop3, &hoop4};
+int numHoops = 2;
+Hoop* hoops[] = {&hoop1, &hoop2};//, &hoop3, &hoop4};
 
 int debugHoop = 0;
 char serialInput;
