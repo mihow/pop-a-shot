@@ -60,7 +60,7 @@ class Hoop
       scoreDisplay.Setup(3, scoreDisplayPin);
       timerDisplay.Setup(2, timerDisplayPin);
 
-      scoreDisplay.ON = 1800; // Lower brightness of score here
+      scoreDisplay.ON = 4095; // Lower brightness of score here
 
       timerDisplay.Set(0);
       scoreDisplay.Set(0);
@@ -181,8 +181,8 @@ class Hoop
         // int seg = effectStep % disp.numSegments;
         // int digit = effectStep % disp.numDigits;
         int i = effectStep % disp.numPins;
-        disp.pins[i] = disp.ON / 100;
-        disp.pins[(i + 1) % disp.numPins] = disp.ON / 10;
+        //disp.pins[i] = disp.ON / 100;
+        //disp.pins[(i + 1) % disp.numPins] = disp.ON / 10;
         disp.pins[(i + 2) % disp.numPins] = disp.ON;
         disp.pins[(i + 3) % disp.numPins] = disp.ON;
         disp.pins[(i + 4) % disp.numPins] = disp.ON;

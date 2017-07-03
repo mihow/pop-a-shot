@@ -1,4 +1,9 @@
-Adafruit_TLC5947 tlc = Adafruit_TLC5947(8, 45, 46, 47, 42);
+#define NUM_TLC5947 4
+#define clock 45
+#define data 46
+#define latch 47
+
+Adafruit_TLC5947 tlc = Adafruit_TLC5947(NUM_TLC5947, clock, data, latch, -1);
 
 
 // Temporary hoop
@@ -52,8 +57,8 @@ Hoop hoop4(
   2 // Multi button light
 );
 
-int numHoops = 1;
-Hoop* hoops[] = {&hoop99};//, &hoop3, &hoop4};
+int numHoops = 2;
+Hoop* hoops[] = {&hoop1, &hoop2};//, &hoop3, &hoop4};
 
 int debugHoop = 0;
 char serialInput;
@@ -99,7 +104,7 @@ void writeDisplay()
   if (timeNow - lastDisplayUpdate > refreshRate)
   {
     // if buffer has changed?
-    tlc.write();
+    tlc.writeFast();
     lastDisplayUpdate = timeNow;
   }
 }
