@@ -68,8 +68,8 @@ class Hoop
       scoreDisplay.Setup(3, 0);
       timerDisplay.Setup(2, 24);
 
-      scoreDisplay.ON = 1800; // Lower brightness of score
-      timerDisplay.ON = 4095; // Max brightness of time
+      scoreDisplay.ON = 800; // Max brightness of score
+      timerDisplay.ON = 3400; // Max brightness of time
       refreshRate = 20;
 
       timerDisplay.Set(0);
