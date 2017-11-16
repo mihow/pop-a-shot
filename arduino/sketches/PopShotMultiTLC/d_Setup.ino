@@ -4,22 +4,10 @@ Hoop hoop1(
   43, // Data
   44, // Latch
   56, // Sensor pin
-  35, // Start button pin // @TODO no light
-  34, // Multi button pin
+  32, // Start button pin 
   5, // Start button light
+  31, // Multi button pin
   2 // Multi button light
-);
- 
-Hoop hoop3(
-  3, // Lane number
-  45, // Clock
-  46, // Data
-  47, // Latch
-  59, // Sensor pin
-  38, // Start button pin
-  37, // Multi button pin
-  6, // Start button light
-  9 // Multi button light
 );
 
 Hoop hoop2(
@@ -28,10 +16,22 @@ Hoop hoop2(
   49, // Data
   50, // Latch
   57, // Sensor pin
-  31, // Start button pin
-  32, // Multi button pin
+  34, // Start button pin
   4, // Start button light
+  34, // Multi button pin
   3 // Multi button light
+);
+
+Hoop hoop3(
+  3, // Lane number
+  45, // Clock
+  46, // Data
+  47, // Latch
+  59, // Sensor pin
+  41, // Start button pin
+  6, // Start button light
+  37, // Multi button pin
+  9 // Multi button light
 );
 
 Hoop hoop4(
@@ -39,15 +39,15 @@ Hoop hoop4(
   51, // Clock
   52, // Data
   53, // Latch
-  58, // Sensor pin // @TODO Wrong pin
-  41, // Start button pin
-  40, // Multi button pin
+  58, // Sensor pin 
+  38, // Start button pin
   7, // Start button light
+  40, // Multi button pin
   8 // Multi button light
 );
 
-int numHoops = 3;
-Hoop* hoops[] = {&hoop2, &hoop3, &hoop4};
+int numHoops = 4;
+Hoop* hoops[] = {&hoop1, &hoop2, &hoop3, &hoop4};
 
 int debugHoop = 0;
 char serialInput;
