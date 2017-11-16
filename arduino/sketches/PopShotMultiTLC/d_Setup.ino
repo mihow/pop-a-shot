@@ -4,10 +4,10 @@ Hoop hoop1(
   43, // Data
   18, // Latch // PIN 44 IS DEAD
   56, // Sensor pin
-  31, // Start button pin 
-  5, // Start button light
-  32, // Multi button pin
-  2 // Multi button light
+  31, // Start button pin // PIN 32 DEAD?
+  2, // Start button light
+  31, // Multi button pin // USED FOR START BUTTON
+  3 // Multi button light
 );
 
 Hoop hoop2(
@@ -16,10 +16,10 @@ Hoop hoop2(
   46, // Data
   47, // Latch
   57, // Sensor pin
-  40, // Start button pin
-  6, // Start button light
-  34, // Multi button pin
-  9 // Multi button light
+  33, // Start button pin // PIN 33 DEAD?
+  4, // Start button light
+  34, // Multi button pin // PIN 34 DEAD?
+  5 // Multi button light
 );
 
 Hoop hoop3(
@@ -29,9 +29,9 @@ Hoop hoop3(
   50, // Latch
   59, // Sensor pin
   41, // Start button pin
-  4, // Start button light
-  -1, // Multi button pin
-  3 // Multi button light
+  6, // Start button light
+  40, // Multi button pin
+  9 // Multi button light
 );
 
 Hoop hoop4(

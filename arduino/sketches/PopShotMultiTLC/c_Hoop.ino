@@ -89,7 +89,7 @@ class Hoop
       pinMode(startButtonLight, OUTPUT);
       pinMode(multiButtonLight, OUTPUT);
       digitalWrite(startButtonLight, HIGH);
-      digitalWrite(multiButtonLight, HIGH);
+      digitalWrite(multiButtonLight, LOW); // Currently does nothing
 
       tlc->begin();
 
@@ -284,7 +284,8 @@ class Hoop
       int multiButtonState = multiButton.read();
 
       digitalWrite(startButtonLight, startButtonState);
-      digitalWrite(multiButtonLight, multiButtonState);
+      // Multi button should be off by default
+      digitalWrite(multiButtonLight, !multiButtonState);
 
       if (startButton.fell()) {
         StartGame();
