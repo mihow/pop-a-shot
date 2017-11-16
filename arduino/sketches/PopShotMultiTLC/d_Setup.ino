@@ -12,18 +12,6 @@ Hoop hoop1(
 
 Hoop hoop2(
   2, // Lane number
-  48, // Clock
-  49, // Data
-  50, // Latch
-  57, // Sensor pin
-  41, // Start button pin
-  4, // Start button light
-  -1, // Multi button pin
-  3 // Multi button light
-);
-
-Hoop hoop3(
-  3, // Lane number
   45, // Clock
   46, // Data
   47, // Latch
@@ -32,6 +20,18 @@ Hoop hoop3(
   6, // Start button light
   37, // Multi button pin
   9 // Multi button light
+);
+
+Hoop hoop3(
+  3, // Lane number
+  48, // Clock
+  49, // Data
+  50, // Latch
+  57, // Sensor pin
+  41, // Start button pin
+  4, // Start button light
+  -1, // Multi button pin
+  3 // Multi button light
 );
 
 Hoop hoop4(
