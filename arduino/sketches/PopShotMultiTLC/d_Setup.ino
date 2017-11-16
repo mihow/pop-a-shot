@@ -2,7 +2,7 @@ Hoop hoop1(
   1, // Lane number
   42, // Clock
   43, // Data
-  44, // Latch
+  18, // Latch // PIN 44 IS DEAD
   56, // Sensor pin
   32, // Start button pin 
   5, // Start button light
