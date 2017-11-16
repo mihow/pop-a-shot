@@ -49,7 +49,7 @@ class Hoop
     bool lastTimerFlashState;
 
 
-    Hoop(int l, int cp, int dp, int lp, int sp, int sbp, int mbp, int sbl, int mbl)
+    Hoop(int l, int cp, int dp, int lp, int sp, int sbp, int sbl, int mbp, int mbl)
     {
       lane = l;
       sensorPin = sp;
@@ -241,6 +241,7 @@ class Hoop
       if (sensor == LOW && lastSensorState == HIGH) {
         shotStartTime = currTime;
         lastSensorState = LOW;
+        Serial.println((String)"Hoop " + lane + " shot started");
       }
 
       if (sensor == HIGH && lastSensorState == LOW) {
