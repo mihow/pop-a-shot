@@ -44,6 +44,7 @@ class Hoop
     unsigned long shotStartTime;
     unsigned long lastScoreTime;
     unsigned long sensorOnTime;
+    unsigned long sinceLastPointTime;
     unsigned long lastStartButtonTime;
     unsigned long lastTimerFlashTime;
     bool lastTimerFlashState;
@@ -91,9 +92,9 @@ class Hoop
       digitalWrite(multiButtonLight, HIGH);
 
       tlc->begin();
-      
+
       PrintStatus();
-      
+
       //scoreDisplay.PrintStatus();
       //timerDisplay.PrintStatus();
     }
@@ -136,6 +137,11 @@ class Hoop
       points = 0;
       scoreDisplay.Set(points);
       lastScoreTime = 0;
+      sensorOnTime = 0;
+      shotStartTime = 0;
+      sinceLastPointTime = 0;
+      lastSensorState = HIGH; // DEFAULT, UNTRIGGERED
+
 
       Serial.println((String)"Hoop " + lane + ": GAME STARTED!");
     }
@@ -156,7 +162,7 @@ class Hoop
         points += 2;
       }
       scoreDisplay.Set(points);
-      Serial.println((String)"Hoop " + lane + " points: " + points);
+      Serial.println((String)"Hoop " + lane + " NEW SCORE: " + points);
     }
 
     void UpdateTimer()
@@ -237,21 +243,25 @@ class Hoop
     void CheckHoopSensor()
     {
       sensor = digitalRead(sensorPin);
+      //Serial.println((String)"Hoop " + lane + " sensor: " + sensor);
 
       if (sensor == LOW && lastSensorState == HIGH) {
         shotStartTime = currTime;
-        lastSensorState = LOW;
+        lastSensorState = sensor;
         Serial.println((String)"Hoop " + lane + " shot started");
       }
 
       if (sensor == HIGH && lastSensorState == LOW) {
         sensorOnTime = currTime - shotStartTime;
+        sinceLastPointTime = currTime - lastScoreTime;
+        lastSensorState = sensor;
         Serial.println((String)"Hoop " + lane + " sensor on time: " + sensorOnTime);
+        Serial.println((String)"Hoop " + lane + " since last point: " + sinceLastPointTime);
 
-        if (sensorOnTime > 24 && sensorOnTime < 300) {
+        if (sensorOnTime > 20 && sensorOnTime < 1000) {
           // Looks like a basketball passing through, not net.
 
-          if (currTime - lastScoreTime > 500) {
+          if (sinceLastPointTime > 400) {
             // Maximum realistic time between shots
 
             AddPoints();
@@ -259,8 +269,10 @@ class Hoop
             lastScoreTime = currTime;
           }
         }
+        sensorOnTime = 0;
+        shotStartTime = 0;
+        sinceLastPointTime = 0;
       }
-      lastSensorState = sensor;
     }
 
     void CheckButtons()
