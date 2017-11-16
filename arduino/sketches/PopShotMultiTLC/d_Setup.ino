@@ -16,9 +16,9 @@ Hoop hoop2(
   49, // Data
   50, // Latch
   57, // Sensor pin
-  34, // Start button pin
+  41, // Start button pin
   4, // Start button light
-  34, // Multi button pin
+  -1, // Multi button pin
   3 // Multi button light
 );
 
@@ -28,7 +28,7 @@ Hoop hoop3(
   46, // Data
   47, // Latch
   59, // Sensor pin
-  41, // Start button pin
+  34, // Start button pin
   6, // Start button light
   37, // Multi button pin
   9 // Multi button light
