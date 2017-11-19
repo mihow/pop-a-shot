@@ -287,7 +287,7 @@ class Hoop
       // Multi button should be off by default
       digitalWrite(multiButtonLight, !multiButtonState);
 
-      if (startButton.fell()) {
+      if (startButton.rose()) {
         StartGame();
       }
     }
