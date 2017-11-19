@@ -18,7 +18,8 @@ class Hoop
     int lane;
     int points;
     int secondsRemaining;
-    int gameLength = 45;
+    int gameLength = 45; // Seconds
+    int millisBeforeScoreClears = 10 * 60 * 60 * 1000; // 10 min
     int effectStep;
 
     int sensorPin;
@@ -48,6 +49,7 @@ class Hoop
     unsigned long lastStartButtonTime;
     unsigned long lastTimerFlashTime;
     bool lastTimerFlashState;
+    bool gamePaused = false;
 
 
     Hoop(int l, int cp, int dp, int lp, int sp, int sbp, int sbl, int mbp, int mbl)
@@ -102,27 +104,28 @@ class Hoop
     void Update()
     {
       currTime = millis();
+      CheckButtons();
+      
+      if (!gamePaused) {
 
-      if (gamePlaying) {
+        if (gamePlaying) {
 
-        UpdateTimer();
-        CheckHoopSensor();
-        CheckButtons(); // @TODO only check when game isn't running?
+          UpdateTimer();
+          CheckHoopSensor();
 
-      } else {
-
-        CheckButtons();
-
-        if (currTime - lastGameOver > 60000) {
-          // Start attractor effect 1 min after game ends
-          UpdateEffect();
-        } else if (currTime - lastGameOver < 5000) {
-          // Flash the timer for 10 seconds after game ends
-          FlashTimer();
         } else {
-          // Keep last score up
-        }
 
+          if ((currTime - lastGameOver) > millisBeforeScoreClears) {
+            // Start attractor effect 10 min after game ends
+            UpdateEffect();
+          } else if ((currTime - lastGameOver) < 5000) {
+            // Flash the timer for 5 seconds after game ends
+            FlashTimer();
+          } else {
+            // Keep last score up
+          }
+
+        }
       }
     }
 
@@ -131,11 +134,11 @@ class Hoop
       gamePlaying = true;
 
       secondsRemaining = gameLength;
-      timerDisplay.Set(55);
-      //lastTimerUpdate = millis();
+      timerDisplay.Set(gameLength);
 
       points = 0;
       scoreDisplay.Set(points);
+
       lastScoreTime = 0;
       sensorOnTime = 0;
       shotStartTime = 0;
@@ -287,8 +290,17 @@ class Hoop
       // Multi button should be off by default
       digitalWrite(multiButtonLight, !multiButtonState);
 
+      if (startButton.fell()) {
+        // Prepare game for before button is released
+        EndGame();
+        timerDisplay.Set(88);
+        scoreDisplay.Set(888);
+        gamePaused = true;
+      }
+
       if (startButton.rose()) {
         StartGame();
+        gamePaused = false;
       }
     }
 
