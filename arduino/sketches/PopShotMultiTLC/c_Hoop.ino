@@ -34,9 +34,10 @@ class Hoop
 
     Bounce startButton;
     Bounce multiButton;
+    Bounce sensorInput;
 
-    int sensor;
-    int lastSensorState;
+    int sensor; // depreciated
+    int lastSensorState; // depreciated
 
     unsigned long currTime;
     unsigned long lastTimerUpdate;
@@ -73,12 +74,14 @@ class Hoop
 
       scoreDisplay.ON = 800; // Max brightness of score
       timerDisplay.ON = 3400; // Max brightness of time
-      refreshRate = 20;
+      refreshRate = 10;
 
       timerDisplay.Set(0);
       scoreDisplay.Set(0);
 
       pinMode(sensorPin, INPUT);
+      //sensorInput.attach(sensorPin);
+      //sensorInput.interval(30);
 
       pinMode(startButtonPin, INPUT_PULLUP);
       startButton.attach(startButtonPin);
@@ -105,7 +108,7 @@ class Hoop
     {
       currTime = millis();
       CheckButtons();
-      
+
       if (!gamePaused) {
 
         if (gamePlaying) {
@@ -241,6 +244,16 @@ class Hoop
       Serial.println((String)"  num timer pins: " + timerDisplay.numPins);
       //Serial.println((String)"  tlc ready: " + tlc->status);
       Serial.println();
+    }
+
+    void CheckHoopSensor2() {
+      sensorInput.update();
+
+      int sensorState = sensorInput.read();
+
+      if (sensorInput.fell()) {
+        AddPoints();
+      }
     }
 
     void CheckHoopSensor()
