@@ -19,7 +19,7 @@ class Hoop
     int points;
     int secondsRemaining;
     int gameLength = 45; // Seconds
-    int millisBeforeScoreClears = 10 * 60 * 60 * 1000; // 10 min
+    int millisBeforeScoreClears = 10 * 60 * 60 * 60 * 1000; // 10 min
     int effectStep;
 
     int sensorPin;
@@ -102,6 +102,7 @@ class Hoop
 
       //scoreDisplay.PrintStatus();
       //timerDisplay.PrintStatus();
+      EndGame();
     }
 
     void Update()
@@ -126,6 +127,8 @@ class Hoop
             FlashTimer();
           } else {
             // Keep last score up
+            // Keep timer on zero
+            timerDisplay.Set(0);
           }
 
         }
