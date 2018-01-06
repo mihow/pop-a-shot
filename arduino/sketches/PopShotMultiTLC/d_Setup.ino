@@ -58,7 +58,7 @@ bool gamesPaused = false;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Setting up...");
 
   //hoop1.Setup();

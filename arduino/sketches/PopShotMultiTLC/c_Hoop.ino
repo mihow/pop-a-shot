@@ -74,14 +74,14 @@ class Hoop
 
       scoreDisplay.ON = 800; // Max brightness of score
       timerDisplay.ON = 3400; // Max brightness of time
-      refreshRate = 10;
+      refreshRate = 100;
 
       timerDisplay.Set(0);
       scoreDisplay.Set(0);
 
       pinMode(sensorPin, INPUT);
       //sensorInput.attach(sensorPin);
-      //sensorInput.interval(30);
+      //sensorInput.interval(40);
 
       pinMode(startButtonPin, INPUT_PULLUP);
       startButton.attach(startButtonPin);
@@ -249,13 +249,17 @@ class Hoop
       Serial.println();
     }
 
-    void CheckHoopSensor2() {
+    void CheckHoopSensorDebounce() {
       sensorInput.update();
 
       int sensorState = sensorInput.read();
 
       if (sensorInput.fell()) {
         AddPoints();
+        Serial.println((String)"SENSOR " + sensorState + " time: " + millis());
+      }
+      if (sensorInput.rose()) {
+        Serial.println((String)"SENSOR " + sensorState + " time: " + millis());
       }
     }
 
@@ -277,11 +281,15 @@ class Hoop
         Serial.println((String)"Hoop " + lane + " sensor on time: " + sensorOnTime);
         Serial.println((String)"Hoop " + lane + " since last point: " + sinceLastPointTime);
 
-        if (sensorOnTime > 20 && sensorOnTime < 1000) {
+        /* 
+         *  HOOP SCORE SENSOR CAN BE ADJUSTED HERE
+         */
+         
+        if (sensorOnTime > 5 && sensorOnTime < 400) {
           // Looks like a basketball passing through, not net.
 
           if (sinceLastPointTime > 400) {
-            // Maximum realistic time between shots
+            // Minimum realistic time between shots
 
             AddPoints();
 
